@@ -1,5 +1,5 @@
 # NEX - Atmospheric Aerosol Dynamics
-## NASA OSSI - Summer 2018
+NASA OSSI - Summer 2018
 ### Datasets
 * PM2.5 FRM/FEM Mass (88101) - Hourly
 	* 2017 - https://aqs.epa.gov/aqsweb/airdata/hourly_88101_2017.zip
