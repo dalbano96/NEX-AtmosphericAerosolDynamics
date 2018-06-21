@@ -30,7 +30,7 @@ hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2017)
 #--------------------------------------------------------------#
 plot.linechart <- function(data, data.date) {
   data %>%
-    subset(Date.Local == data.date) %>%
+    subset(Date.Local == data.date & POC == 1) %>%
     ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
     geom_line() +
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
@@ -50,10 +50,10 @@ leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, Co
   addProviderTiles(providers$CartoDB.Positron)
 
 #--------------------------------------------------------------#
-# Hourly Data of San Francisco, CA area
+# Hourly Data of San Francisco-Oakland region
 #--------------------------------------------------------------#
 # Extract data from local sites
-CA.sites <- subset(hourly.pm25.FRM.14_17, 
+sf_oak.sites <- subset(hourly.pm25.FRM.14_17, 
                   (Site.Num == 5 |
                      Site.Num == 11 |
                      Site.Num == 12 |
@@ -61,12 +61,34 @@ CA.sites <- subset(hourly.pm25.FRM.14_17,
                     (County.Name == "San Francisco" |
                        County.Name == "Alameda"))
 
-# Plot the site data
-CA.plot <- plot.linechart(CA.sites, "2015-12-25")
-CA.plot
+# Plot site data
+sf_oak.plot <- plot.linechart(sf_oak.sites, "2015-12-25")
+sf_oak.plot
 
 #--------------------------------------------------------------#
-# Hourly Data of Hawaii County area
+# Hourly Data of New York City region
+#--------------------------------------------------------------#
+# Extract data from local sites
+nyc.sites <- subset(hourly.pm25.FRM.14_17, 
+                       (Site.Num == 10 |
+                          Site.Num == 110 |
+                          Site.Num == 124 |
+                          Site.Num == 1003 |
+                          Site.Num == 3 |
+                          Site.Num == 4) & 
+                         (County.Name == "Bergen" | 
+                            County.Name == "Bronx" |
+                            County.Name == "Queens" |
+                            County.Name == "Hudson" |
+                            County.Name == "Essex" |
+                            County.Name == "Union"))
+
+# Plot site data
+nyc.plot <- plot.linechart(nyc.sites, "2015-12-25")
+nyc.plot
+
+#--------------------------------------------------------------#
+# Hourly Data of Hawaii region
 #--------------------------------------------------------------#
 # Extract data from local sites
 hi.sites <- subset(hourly.pm25.FRM.14_17,
