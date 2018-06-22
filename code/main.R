@@ -28,9 +28,9 @@ hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2017)
 #--------------------------------------------------------------#
 # Functions
 #--------------------------------------------------------------#
-plot.linechart <- function(data, data.date) {
+plot.linechart <- function(data, data.date, data.poc) {
   data %>%
-    subset(Date.Local == data.date & POC == 1) %>%
+    subset(Date.Local == data.date & POC == data.poc) %>%
     ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
     geom_line() +
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
@@ -62,7 +62,7 @@ sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
                        County.Name == "Alameda"))
 
 # Plot site data
-sf_oak.plot <- plot.linechart(sf_oak.sites, "2015-12-25")
+sf_oak.plot <- plot.linechart(sf_oak.sites, "2016-12-25", 3)
 sf_oak.plot
 
 #--------------------------------------------------------------#
@@ -70,21 +70,13 @@ sf_oak.plot
 #--------------------------------------------------------------#
 # Extract data from local sites
 nyc.sites <- subset(hourly.pm25.FRM.14_17, 
-                       (Site.Num == 10 |
-                          Site.Num == 110 |
-                          Site.Num == 124 |
-                          Site.Num == 1003 |
-                          Site.Num == 3 |
-                          Site.Num == 4) & 
-                         (County.Name == "Bergen" | 
-                            County.Name == "Bronx" |
-                            County.Name == "Queens" |
-                            County.Name == "Hudson" |
-                            County.Name == "Essex" |
-                            County.Name == "Union"))
+                       (Site.Num == 110 |
+                          Site.Num == 124) & 
+                         (County.Name == "Bronx" |
+                            County.Name == "Queens"))
 
 # Plot site data
-nyc.plot <- plot.linechart(nyc.sites, "2015-12-25")
+nyc.plot <- plot.linechart(nyc.sites, "2016-12-25", 4)
 nyc.plot
 
 #--------------------------------------------------------------#
@@ -101,9 +93,10 @@ hi.sites <- subset(hourly.pm25.FRM.14_17,
                      (County.Name == "Hawaii"))
 
 # Plot the site data
-hi.plot <- plot.linechart(hi.sites, "2014-08-20")
+hi.plot <- plot.linechart(hi.sites, "2016-12-25", 1)
 hi.plot
 
+unique(select(subset(hourly.pm25.FRM.14_17, State.Name == "New York"), POC))
 
 #--------------------------------------------------------------#
 # Map ALL active site locations
