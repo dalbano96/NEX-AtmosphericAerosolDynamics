@@ -42,12 +42,18 @@ plot.linechart <- function(data, data.date, data.poc) {
 #--------------------------------------------------------------#
 # Map site locations containing PM2.5 FRM/FEM data
 #--------------------------------------------------------------#
-leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name)))) %>%
+leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name, POC)))) %>%
   addCircles(~Longitude, ~Latitude, 
              label = ~paste("Site Num: ", Site.Num, ",",
-                           "County Name: ", County.Name)) %>%
+                           "County Name: ", County.Name, ", ",
+                           "POC: ", POC)) %>%
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron)
+
+#--------------------------------------------------------------#
+# Date to observe (2014-01-01 to 2017-12-31)
+#--------------------------------------------------------------#
+observed.date <- "2017-09-18"
 
 #--------------------------------------------------------------#
 # Hourly Data of San Francisco-Oakland region
@@ -62,7 +68,7 @@ sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
                        County.Name == "Alameda"))
 
 # Plot site data
-sf_oak.plot <- plot.linechart(sf_oak.sites, "2016-12-25", 3)
+sf_oak.plot <- plot.linechart(sf_oak.sites, observed.date, 3)
 sf_oak.plot
 
 #--------------------------------------------------------------#
@@ -76,7 +82,7 @@ nyc.sites <- subset(hourly.pm25.FRM.14_17,
                             County.Name == "Queens"))
 
 # Plot site data
-nyc.plot <- plot.linechart(nyc.sites, "2016-12-25", 4)
+nyc.plot <- plot.linechart(nyc.sites, observed.date, 4)
 nyc.plot
 
 #--------------------------------------------------------------#
@@ -93,9 +99,13 @@ hi.sites <- subset(hourly.pm25.FRM.14_17,
                      (County.Name == "Hawaii"))
 
 # Plot the site data
-hi.plot <- plot.linechart(hi.sites, "2016-12-25", 1)
+hi.plot <- plot.linechart(hi.sites, observed.date, 1)
 hi.plot
 
+#--------------------------------------------------------------#
+# Notes
+#--------------------------------------------------------------#
+(count(select(subset(hourly.pm25.FRM.14_17, Sample.Measurement < 0.00), Sample.Measurement)) / count(hourly.pm25.FRM.14_17)) * 100
 unique(select(subset(hourly.pm25.FRM.14_17, State.Name == "New York"), POC))
 
 #--------------------------------------------------------------#
