@@ -31,25 +31,28 @@ hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_201
 #--------------------------------------------------------------#
 # Functions
 #--------------------------------------------------------------#
-plot.linechart <- function(data, data.date, data.method) {
-  data %>%
-    subset(Date.Local == data.date & Method.Code == data.method) %>%
-      ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num), title = Date.Local)) +
-      geom_line() +
-      geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-      labs(x = "Local time", y = "Micrograms/cubic meter", color = "Sites")
-      # + ggtitle(paste(Date.Local, " ", State.Name, " ", Method.Code))
+plot.linechart <- function(data, data.date, data.method.code) {
+  data.map <- data %>%
+    subset(Date.Local == data.date & Method.Code == data.method.code) %>%
+    ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
+    geom_line() +
+    geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    labs(x = "Local time", y = "Micrograms/cubic meter", color = "Sites") +
+    ggtitle(paste0(data.date, ", ", data$State.Name, ", Method Code: ", data.method.code))
+  return data.map
 }
 
 #--------------------------------------------------------------#
-# Map site locations
+# Map all site locations
 # PM2.5 FRM/FEM data
 # Method.Code - 170
+# AERONET Site - NASA_Ames
+# Used to determine site locations to analyze
 #--------------------------------------------------------------#
 leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longitude, Latitude, Site.Num, County.Name, Method.Code)))) %>%
   addCircles(~Longitude, ~Latitude, 
-             label = ~paste("Site Num: ", Site.Num, ",",
+             label = ~paste("Site Num: ", Site.Num, ", ",
                            "County Name: ", County.Name, ", ",
                            "Method Code: ", Method.Code)) %>%
   addCircles(data = unique(select(hourly.AOD.AMES.14_17, 
@@ -83,47 +86,46 @@ observed.date <- "2017-09-18"
 # Extract data from local sites
 sf_oak.sites <- subset(hourly.pm25.FRM.14_17, 
                   (Site.Num == 5 |
-                     Site.Num == 11 |
-                     Site.Num == 12 |
-                     Site.Num == 9) & 
-                    (County.Name == "San Francisco" |
-                       County.Name == "Alameda"))
+                     Site.Num == 1001 |
+                     Site.Num == 6) & 
+                    (County.Name == "San Mateo" |
+                       County.Name == "Santa Clara"))
 
 # Plot site data
 sf_oak.method.code = 170
-sf_oak.plot <- plot.linechart(sf_oak.sites, observed.date, sf_oak.method.code)
-sf_oak.plot
+sf_oak.plot.linechart <- plot.linechart(sf_oak.sites, observed.date, sf_oak.method.code)
+sf_oak.plot.linechart
 
 #--------------------------------------------------------------#
-# Hourly Data of New York City region
-#--------------------------------------------------------------#
-# Extract data from local sites
-nyc.sites <- subset(hourly.pm25.FRM.14_17, 
-                       (Site.Num == 110 |
-                          Site.Num == 124) & 
-                         (County.Name == "Bronx" |
-                            County.Name == "Queens"))
-
-# Plot site data
-nyc.plot <- plot.linechart(nyc.sites, observed.date, 4)
-nyc.plot
-
-#--------------------------------------------------------------#
-# Hourly Data of Hawaii region
-#--------------------------------------------------------------#
-# Extract data from local sites
-hi.sites <- subset(hourly.pm25.FRM.14_17,
-                   (Site.Num == 1006 |
-                      Site.Num == 7 |
-                      Site.Num == 2023 |
-                      Site.Num == 2016 |
-                      Site.Num == 2020 |
-                      Site.Num == 1012) &
-                     (County.Name == "Hawaii"))
-
-# Plot the site data
-hi.plot <- plot.linechart(hi.sites, observed.date, 1)
-hi.plot
+# # Hourly Data of New York City region
+# #--------------------------------------------------------------#
+# # Extract data from local sites
+# nyc.sites <- subset(hourly.pm25.FRM.14_17, 
+#                        (Site.Num == 110 |
+#                           Site.Num == 124) & 
+#                          (County.Name == "Bronx" |
+#                             County.Name == "Queens"))
+# 
+# # Plot site data
+# nyc.plot <- plot.linechart(nyc.sites, observed.date, 4)
+# nyc.plot
+# 
+# #--------------------------------------------------------------#
+# # Hourly Data of Hawaii region
+# #--------------------------------------------------------------#
+# # Extract data from local sites
+# hi.sites <- subset(hourly.pm25.FRM.14_17,
+#                    (Site.Num == 1006 |
+#                       Site.Num == 7 |
+#                       Site.Num == 2023 |
+#                       Site.Num == 2016 |
+#                       Site.Num == 2020 |
+#                       Site.Num == 1012) &
+#                      (County.Name == "Hawaii"))
+# 
+# # Plot the site data
+# hi.plot <- plot.linechart(hi.sites, observed.date, 1)
+# hi.plot
 
 #--------------------------------------------------------------#
 # Notes
