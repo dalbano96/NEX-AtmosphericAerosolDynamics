@@ -12,6 +12,7 @@ library(scales)
 library(tidyverse)
 library(geojsonR)
 library(leaflet)
+library(sp)
 
 #--------------------------------------------------------------#
 # Read csv to data frame
@@ -25,28 +26,49 @@ hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.2014, hourly.pm25.FRM.2015)
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2016)
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2017)
 
+hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_20171231_NASA_Ames.csv", stringsAsFactors = FALSE)
+
 #--------------------------------------------------------------#
 # Functions
 #--------------------------------------------------------------#
-plot.linechart <- function(data, data.date, data.poc) {
+plot.linechart <- function(data, data.date, data.method) {
   data %>%
-    subset(Date.Local == data.date & POC == data.poc) %>%
-    ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
-    geom_line() +
-    geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(x = "Local time", y = "Micrograms/cubic meter", color = "Sites") +
-    ggtitle(paste0(data.date, " ", unique(select(data, State.Name))))
+    subset(Date.Local == data.date & Method.Code == data.method) %>%
+      ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num), title = Date.Local)) +
+      geom_line() +
+      geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+      labs(x = "Local time", y = "Micrograms/cubic meter", color = "Sites")
+      # + ggtitle(paste(Date.Local, " ", State.Name, " ", Method.Code))
 }
 
 #--------------------------------------------------------------#
-# Map site locations containing PM2.5 FRM/FEM data
+# Map site locations
+# PM2.5 FRM/FEM data
+# Method.Code - 170
 #--------------------------------------------------------------#
-leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name, POC)))) %>%
+leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longitude, Latitude, Site.Num, County.Name, Method.Code)))) %>%
   addCircles(~Longitude, ~Latitude, 
              label = ~paste("Site Num: ", Site.Num, ",",
                            "County Name: ", County.Name, ", ",
-                           "POC: ", POC)) %>%
+                           "Method Code: ", Method.Code)) %>%
+  addCircles(data = unique(select(hourly.AOD.AMES.14_17, 
+                           c(Site_Latitude.Degrees.,
+                             Site_Longitude.Degrees., 
+                             AERONET_Site_Name))),
+             lng = ~Site_Longitude.Degrees.,
+             lat = ~Site_Latitude.Degrees.,
+             color = "red",
+             label = ~paste("Site Name: ", AERONET_Site_Name)) %>%
+  addTiles() %>%
+  addProviderTiles(providers$CartoDB.Positron)
+
+#--------------------------------------------------------------#
+# Map site locations for AERONET AOD sites
+#--------------------------------------------------------------#
+leaflet(unique(select(hourly.AOD.AMES.14_17, c(Site_Latitude.Degrees., Site_Longitude.Degrees., AERONET_Site_Name)))) %>%
+  addCircles(~Site_Longitude.Degrees., ~Site_Latitude.Degrees., 
+             label = ~paste("Site Name: ", AERONET_Site_Name)) %>%
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron)
 
@@ -68,7 +90,8 @@ sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
                        County.Name == "Alameda"))
 
 # Plot site data
-sf_oak.plot <- plot.linechart(sf_oak.sites, observed.date, 3)
+sf_oak.method.code = 170
+sf_oak.plot <- plot.linechart(sf_oak.sites, observed.date, sf_oak.method.code)
 sf_oak.plot
 
 #--------------------------------------------------------------#
