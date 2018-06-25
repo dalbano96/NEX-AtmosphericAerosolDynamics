@@ -13,6 +13,7 @@ library(tidyverse)
 library(geojsonR)
 library(leaflet)
 library(sp)
+library(lubridate)
 
 #--------------------------------------------------------------#
 # Read csv to data frame
@@ -26,13 +27,25 @@ hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.2014, hourly.pm25.FRM.2015)
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2016)
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2017)
 
+# Convert Date columns to date objects
+hourly.pm25.FRM.14_17$Date.Local <- as.Date(hourly.pm25.FRM.14_17$Date.Local, format = "%F")
+hourly.pm25.FRM.14_17$Date.GMT <- as.Date(hourly.pm25.FRM.14_17$Date.GMT, format = "%F")
+
+# importing and formatting AOD datasets
+hourly.AOD.AMES.14_17 <- NULL
 hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_20171231_NASA_Ames.csv", stringsAsFactors = FALSE)
+
+hourly.AOD.AMES.14_17$Date.dd.mm.yyyy. <- as.Date(hourly.AOD.AMES.14_17$Date.dd.mm.yyyy., format = "%m/%d/%y")
+hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Date.Local = Date.dd.mm.yyyy.)
+hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.Local = Time.hh.mm.ss.)
+
+pm25.AOD.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.AOD.AMES.14_17)
 
 #--------------------------------------------------------------#
 # Functions
 #--------------------------------------------------------------#
 plot.linechart <- function(data, data.date, data.method.code) {
-  data.map <- data %>%
+  data %>%
     subset(Date.Local == data.date & Method.Code == data.method.code) %>%
     ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
     geom_line() +
@@ -40,7 +53,6 @@ plot.linechart <- function(data, data.date, data.method.code) {
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Local time", y = "Micrograms/cubic meter", color = "Sites") +
     ggtitle(paste0(data.date, ", ", data$State.Name, ", Method Code: ", data.method.code))
-  return data.map
 }
 
 #--------------------------------------------------------------#
@@ -78,7 +90,7 @@ leaflet(unique(select(hourly.AOD.AMES.14_17, c(Site_Latitude.Degrees., Site_Long
 #--------------------------------------------------------------#
 # Date to observe (2014-01-01 to 2017-12-31)
 #--------------------------------------------------------------#
-observed.date <- "2017-09-18"
+observed.date <- "2016-09-22"
 
 #--------------------------------------------------------------#
 # Hourly Data of San Francisco-Oakland region
@@ -95,6 +107,10 @@ sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
 sf_oak.method.code = 170
 sf_oak.plot.linechart <- plot.linechart(sf_oak.sites, observed.date, sf_oak.method.code)
 sf_oak.plot.linechart
+
+ggplot(data = subset(sf_oak.sites, Date.Local > "2015-09-01" & Date.Local < "2015-09-08" & Method.Code == 170)) +
+  geom_point(mapping = aes(x = Time.Local, y = Sample.Measurement, color = Date.Local)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 #--------------------------------------------------------------#
 # # Hourly Data of New York City region
