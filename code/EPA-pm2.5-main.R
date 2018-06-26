@@ -31,7 +31,12 @@ hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2017)
 
 # Convert Date columns to date objects
 hourly.pm25.FRM.14_17$Date.Local <- as.Date(hourly.pm25.FRM.14_17$Date.Local, format = "%F")
-hourly.pm25.FRM.14_17$Date.Local <- as.Date(hourly.pm25.FRM.14_17$Date.Local, format = "%F")
+hourly.pm25.FRM.14_17$Date.GMT <- as.Date(hourly.pm25.FRM.14_17$Date.GMT, format = "%F")
+
+# Joining date and time into single column
+hourly.pm25.FRM.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.GMT, 
+                                                       hourly.pm25.FRM.14_17$Time.GMT), 
+                                                 format = "%Y-%m-%d %H:%M")
 
 #--------------------------------------------------------------#
 # Functions
@@ -54,7 +59,7 @@ plot.linechart <- function(data, data.date, data.method.code) {
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
 leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longitude, Latitude, Site.Num, County.Name, Method.Code)))) %>%
-  addCircles(~Longitude, ~Latitude, 
+  addCircles(~Longitude, ~Latitude,
              label = ~paste("Site Num: ", Site.Num, ", ",
                            "County Name: ", County.Name, ", ",
                            "Method Code: ", Method.Code)) %>%
@@ -70,32 +75,34 @@ observed.date <- "2016-09-22"
 # Hourly Data of San Francisco-Oakland region
 #--------------------------------------------------------------#
 # Extract data from local sites
-sf_oak.sites <- subset(hourly.pm25.FRM.14_17, 
+sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
                   (Site.Num == 5 |
                      Site.Num == 1001 |
-                     Site.Num == 6) & 
+                     Site.Num == 6) &
                     (County.Name == "San Mateo" |
                        County.Name == "Santa Clara"))
 
 # Plot site data
 sf_oak.method.code = 170
-sf_oak.plot.linechart <- plot.linechart(sf_oak.sites, observed.date, sf_oak.method.code)
+sf_oak.plot.linechart <- plot.linechart(sf_oak.sites, 
+                                        observed.date, 
+                                        sf_oak.method.code)
 sf_oak.plot.linechart
 
 #--------------------------------------------------------------#
 # # Hourly Data of New York City region
 # #--------------------------------------------------------------#
 # # Extract data from local sites
-# nyc.sites <- subset(hourly.pm25.FRM.14_17, 
+# nyc.sites <- subset(hourly.pm25.FRM.14_17,
 #                        (Site.Num == 110 |
-#                           Site.Num == 124) & 
+#                           Site.Num == 124) &
 #                          (County.Name == "Bronx" |
 #                             County.Name == "Queens"))
-# 
+#
 # # Plot site data
 # nyc.plot <- plot.linechart(nyc.sites, observed.date, 4)
 # nyc.plot
-# 
+#
 # #--------------------------------------------------------------#
 # # Hourly Data of Hawaii region
 # #--------------------------------------------------------------#
@@ -108,7 +115,7 @@ sf_oak.plot.linechart
 #                       Site.Num == 2020 |
 #                       Site.Num == 1012) &
 #                      (County.Name == "Hawaii"))
-# 
+#
 # # Plot the site data
 # hi.plot <- plot.linechart(hi.sites, observed.date, 1)
 # hi.plot
@@ -124,11 +131,11 @@ unique(select(subset(hourly.pm25.FRM.14_17, State.Name == "New York"), POC))
 #--------------------------------------------------------------#
 # aqsSites.all <- read.csv("data/aqs_sites.csv", stringsAsFactors = FALSE)
 # aqsSites.open <- subset(aqsSites.all, Site.Closed.Date == "")
-# leaflet(unique(select(subset(aqsSites.open, !is.null(Site.Closed.Date)),c(Longitude, 
-#                                                                           Latitude, 
-#                                                                           Site.Number, 
+# leaflet(unique(select(subset(aqsSites.open, !is.null(Site.Closed.Date)),c(Longitude,
+#                                                                           Latitude,
+#                                                                           Site.Number,
 #                                                                           County.Name)))) %>%
-#   addCircles(~Longitude, ~Latitude, 
+#   addCircles(~Longitude, ~Latitude,
 #              label = ~paste("Site Num: ", Site.Number, ";",
 #                             "County Name: ", County.Name)) %>%
 #   addTiles() %>%

@@ -20,27 +20,37 @@ library(reshape2)
 #--------------------------------------------------------------#
 # Read AOD csv to data frame
 #--------------------------------------------------------------#
-# importing and formatting AOD datasets
+# 1) importing AOD datasets
 hourly.AOD.AMES.14_17 <- NULL
 hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_20171231_NASA_Ames.csv", stringsAsFactors = FALSE)
 
-# Change date format of Date.GMT
+# 2) Change date format of Date.GMT. Corrects to "yyyy-mm-dd"
 hourly.AOD.AMES.14_17$Date.dd.mm.yyyy. <- as.Date(hourly.AOD.AMES.14_17$Date.dd.mm.yyyy., format = "%m/%d/%y")
 
-# Rename date and time to Date.GMT and Time.GMT
+# 3) Rename date/time columns to Date.GMT and Time.GMT since those units were measured
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Date.GMT = Date.dd.mm.yyyy.)
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.GMT = Time.hh.mm.ss.)
 
-# Removes minutes and seconds from Time.GMT
+# 4) Removes minutes and seconds from Time.GMT to show only its hour
 hourly.AOD.AMES.14_17$Time.GMT <- strptime(hourly.AOD.AMES.14_17$Time.GMT, format = "%H")
-# Removes date portion and formats Time.GMT as character type
+
+# 5) Removes date portion and formats Time.GMT as character type
 hourly.AOD.AMES.14_17$Time.GMT <- format(hourly.AOD.AMES.14_17$Time.GMT, format = "%H:%M:%S")
 
-# Joining date and time into single column
-hourly.pm25.FRM.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.GMT, hourly.pm25.FRM.14_17$Time.GMT), format = "%Y-%m-%d %H:%M")
-hourly.AOD.AMES.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.GMT, hourly.AOD.AMES.14_17$Time.GMT), format = "%Y-%m-%d %H")
+# 6) Joining date and time into a new column
+hourly.AOD.AMES.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.GMT,
+                                                       hourly.AOD.AMES.14_17$Time.GMT),
+                                                 format = "%Y-%m-%d %H")
 
-# Setting all -999 to NA
+# 7) Setting all -999 to NA TODO: There has to be a better way to format this. F**k it, R is dumb (delete l8r, lulzhackz)
+varnames <- c("AOD_1640nm")
+
+for (i in varnames) {
+  hourly.AOD.AMES.14_17 <- mutate(hourly.AOD.AMES.14_17[,i] = replace(hourly.AOD.AMES.14_17[,i], hourly.AOD.AMES.14_17[,i] == -999, NA))
+}
+
+count(subset(select(hourly.AOD.AMES.14_17, AOD_1640nm), AOD_1640nm == -999))
+
 hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
   mutate(AOD_1640nm = replace(AOD_1640nm, AOD_1640nm == -999, NA)) %>%
   mutate(AOD_1020nm = replace(AOD_1020nm, AOD_1020nm == -999, NA)) %>%
@@ -56,16 +66,6 @@ ggplot(subset(hourly.AOD.AMES.14_17, DateTime.GMT >= "2015-08-01" & DateTime.GMT
        aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
   geom_point()
 
-# Graph of AOD
-ggplot(subset(hourly.AOD.AMES.14_17, Date.GMT > "2015-08-15" & Date.GMT < "2015-09-13")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_1640nm, color = "AOD_1640nm")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_1020nm, color = "AOD_1020nm")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_870nm, color = "AOD_870nm")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_675nm, color = "AOD_675nm")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_500nm, color = "AOD_500nm")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_440nm, color = "AOD_440nm")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_380nm, color = "AOD_380nm")) +
-  geom_point(aes(x = DateTime.GMT, y = AOD_340nm, color = "AOD_340nm"))
 
 # Collecting needed columns
 testdf <- NULL
@@ -88,10 +88,19 @@ ggplot(subset(testdf, DateTime.GMT > "2016-01-01" & DateTime.GMT < "2016-12-31")
 # Map site locations for AERONET AOD sites
 #--------------------------------------------------------------#
 leaflet(unique(select(hourly.AOD.AMES.14_17, c(Site_Latitude.Degrees., Site_Longitude.Degrees., AERONET_Site_Name)))) %>%
-  addCircles(~Site_Longitude.Degrees., ~Site_Latitude.Degrees., 
+  addCircles(~Site_Longitude.Degrees., ~Site_Latitude.Degrees.,
              label = ~paste("Site Name: ", AERONET_Site_Name)) %>%
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron)
 
 
-
+# # Graph of AOD
+# ggplot(subset(hourly.AOD.AMES.14_17, Date.GMT > "2015-08-15" & Date.GMT < "2015-09-13")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_1640nm, color = "AOD_1640nm")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_1020nm, color = "AOD_1020nm")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_870nm, color = "AOD_870nm")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_675nm, color = "AOD_675nm")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_500nm, color = "AOD_500nm")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_440nm, color = "AOD_440nm")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_380nm, color = "AOD_380nm")) +
+#   geom_point(aes(x = DateTime.GMT, y = AOD_340nm, color = "AOD_340nm"))
