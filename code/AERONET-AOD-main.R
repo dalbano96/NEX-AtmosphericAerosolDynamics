@@ -42,15 +42,7 @@ hourly.AOD.AMES.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Dat
                                                        hourly.AOD.AMES.14_17$Time.GMT),
                                                  format = "%Y-%m-%d %H")
 
-# 7) Setting all -999 to NA TODO: There has to be a better way to format this. F**k it, R is dumb (delete l8r, lulzhackz)
-varnames <- c("AOD_1640nm")
-
-for (i in varnames) {
-  hourly.AOD.AMES.14_17 <- mutate(hourly.AOD.AMES.14_17[,i] = replace(hourly.AOD.AMES.14_17[,i], hourly.AOD.AMES.14_17[,i] == -999, NA))
-}
-
-count(subset(select(hourly.AOD.AMES.14_17, AOD_1640nm), AOD_1640nm == -999))
-
+# 7) Setting all -999 to NA TODO: There has to be a better way to format this.
 hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
   mutate(AOD_1640nm = replace(AOD_1640nm, AOD_1640nm == -999, NA)) %>%
   mutate(AOD_1020nm = replace(AOD_1020nm, AOD_1020nm == -999, NA)) %>%
@@ -62,9 +54,11 @@ hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
   mutate(AOD_340nm = replace(AOD_340nm, AOD_340nm == -999, NA)) %>%
   mutate(X440.870_Angstrom_Exponent = replace(X440.870_Angstrom_Exponent, X440.870_Angstrom_Exponent == -999, NA))
 
-ggplot(subset(hourly.AOD.AMES.14_17, DateTime.GMT >= "2015-08-01" & DateTime.GMT <= "2015-12-31"),
-       aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
-  geom_point()
+hourly.AOD.AMES.14_17 %>%
+  na.omit() %>%
+  subset(DateTime.GMT >= "2015-08-01" & DateTime.GMT <= "2015-12-31") %>%
+  ggplot(aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
+    geom_point()
 
 
 # Collecting needed columns
