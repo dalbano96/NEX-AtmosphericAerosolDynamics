@@ -35,13 +35,27 @@ hourly.pm25.FRM.14_17$Date.GMT <- as.Date(hourly.pm25.FRM.14_17$Date.GMT, format
 hourly.AOD.AMES.14_17 <- NULL
 hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_20171231_NASA_Ames.csv", stringsAsFactors = FALSE)
 
+# Change date format of Date.Local
 hourly.AOD.AMES.14_17$Date.dd.mm.yyyy. <- as.Date(hourly.AOD.AMES.14_17$Date.dd.mm.yyyy., format = "%m/%d/%y")
+# Rename date and time to Date.Local and Time.Local
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Date.Local = Date.dd.mm.yyyy.)
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.Local = Time.hh.mm.ss.)
 
+# Removes minutes and seconds from Time.Local
+hourly.AOD.AMES.14_17$Time.Local <- strptime(hourly.AOD.AMES.14_17$Time.Local, format = "%H")
+# Removes date portion and formats as character
+hourly.AOD.AMES.14_17$Time.Local <- format(hourly.AOD.AMES.14_17$Time.Local, format = "%H:%M:%S")
+# hourly.AOD.AMES.14_17$DateTime.Local <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.Local, hourly.AOD.AMES.14_17$Time.Local), format = "%Y-%m-%d %H")
+
+
 # Joining date and time into single column
-hourly.AOD.AMES.14_17$DateTime.Local <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.Local, hourly.AOD.AMES.14_17$Time.Local), format = "%Y-%m-%d %H:%M:%S")
 hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.Local, hourly.pm25.FRM.14_17$Time.Local), format = "%Y-%m-%d %H:%M")
+
+ggplot(subset(hourly.AOD.AMES.14_17, Date.Local == "2016-02-04")) +
+  geom_point(aes(x = Time.Local, y = AOD_1640nm, color = "red")) +
+  geom_point(aes(x = Time.Local, y = AOD_1020nm, color = "blue")) +
+  geom_point(aes(x = Time.Local, y = AOD_870nm, color = "green")) +
+  geom_point(aes(x = Time.Local, y = AOD_675nm, color = "brown"))
 
 #--------------------------------------------------------------#
 # Functions
