@@ -53,20 +53,6 @@ plot.linechart <- function(data, data.date, data.method.code) {
 }
 
 #--------------------------------------------------------------#
-# Map all site locations
-# PM2.5 FRM/FEM data
-# Method.Code - 170
-# Used to determine site locations to analyze
-#--------------------------------------------------------------#
-leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longitude, Latitude, Site.Num, County.Name, Method.Code)))) %>%
-  addCircles(~Longitude, ~Latitude,
-             label = ~paste("Site Num: ", Site.Num, ", ",
-                           "County Name: ", County.Name, ", ",
-                           "Method Code: ", Method.Code)) %>%
-  addTiles() %>%
-  addProviderTiles(providers$CartoDB.Positron)
-
-#--------------------------------------------------------------#
 # Date to observe (2014-01-01 to 2017-12-31)
 #--------------------------------------------------------------#
 observed.date <- "2016-09-22"
