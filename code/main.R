@@ -62,10 +62,8 @@ hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
   mutate(AOD_380nm = replace(AOD_380nm, AOD_380nm == -999, NA)) %>%
   mutate(AOD_340nm = replace(AOD_340nm, AOD_340nm == -999, NA))
 
-# Collecting needed columns
-testdf <- hourly.AOD.AMES.14_17[, c(1,2,5:7,10,19,22,25,26,114)]
-
-ggplot(subset(testdf, Date.Local > "2015-08-15" & Date.Local < "2015-09-13")) +
+# Graph of AOD
+ggplot(subset(hourly.AOD.AMES.14_17, Date.Local > "2015-08-15" & Date.Local < "2015-09-13")) +
   geom_point(aes(x = DateTime.Local, y = AOD_1640nm, color = "AOD_1640nm")) +
   geom_point(aes(x = DateTime.Local, y = AOD_1020nm, color = "AOD_1020nm")) +
   geom_point(aes(x = DateTime.Local, y = AOD_870nm, color = "AOD_870nm")) +
@@ -74,6 +72,15 @@ ggplot(subset(testdf, Date.Local > "2015-08-15" & Date.Local < "2015-09-13")) +
   geom_point(aes(x = DateTime.Local, y = AOD_440nm, color = "AOD_440nm")) +
   geom_point(aes(x = DateTime.Local, y = AOD_380nm, color = "AOD_380nm")) +
   geom_point(aes(x = DateTime.Local, y = AOD_340nm, color = "AOD_340nm"))
+
+# Collecting needed columns
+testdf <- NULL
+testdf <- hourly.AOD.AMES.14_17[, c(114,5:7,10,19,22,25,26)]
+testdf <- gather(testdf, AOD, value, -DateTime.Local)
+
+ggplot(subset(testdf, DateTime.Local > "2015-08-15" & DateTime.Local < "2015-09-13"),
+       aes(x = DateTime.Local, y = value, group = AOD, color = AOD)) +
+  geom_line()
 
 #--------------------------------------------------------------#
 # Functions
