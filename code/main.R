@@ -14,6 +14,7 @@ library(geojsonR)
 library(leaflet)
 library(sp)
 library(lubridate)
+library(reshape2)
 
 #--------------------------------------------------------------#
 # Read csv to data frame
@@ -45,17 +46,34 @@ hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.Local = Time.hh.mm.s
 hourly.AOD.AMES.14_17$Time.Local <- strptime(hourly.AOD.AMES.14_17$Time.Local, format = "%H")
 # Removes date portion and formats as character
 hourly.AOD.AMES.14_17$Time.Local <- format(hourly.AOD.AMES.14_17$Time.Local, format = "%H:%M:%S")
-# hourly.AOD.AMES.14_17$DateTime.Local <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.Local, hourly.AOD.AMES.14_17$Time.Local), format = "%Y-%m-%d %H")
-
 
 # Joining date and time into single column
 hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.Local, hourly.pm25.FRM.14_17$Time.Local), format = "%Y-%m-%d %H:%M")
+hourly.AOD.AMES.14_17$DateTime.Local <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.Local, hourly.AOD.AMES.14_17$Time.Local), format = "%Y-%m-%d %H")
 
-ggplot(subset(hourly.AOD.AMES.14_17, Date.Local == "2016-02-04")) +
-  geom_point(aes(x = Time.Local, y = AOD_1640nm, color = "red")) +
-  geom_point(aes(x = Time.Local, y = AOD_1020nm, color = "blue")) +
-  geom_point(aes(x = Time.Local, y = AOD_870nm, color = "green")) +
-  geom_point(aes(x = Time.Local, y = AOD_675nm, color = "brown"))
+# Setting all -999 to NA
+hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
+  mutate(AOD_1640nm = replace(AOD_1640nm, AOD_1640nm == -999, NA)) %>%
+  mutate(AOD_1020nm = replace(AOD_1020nm, AOD_1020nm == -999, NA)) %>%
+  mutate(AOD_870nm = replace(AOD_870nm, AOD_870nm == -999, NA)) %>%
+  mutate(AOD_675nm = replace(AOD_675nm, AOD_675nm == -999, NA)) %>%
+  mutate(AOD_500nm = replace(AOD_500nm, AOD_500nm == -999, NA)) %>%
+  mutate(AOD_440nm = replace(AOD_440nm, AOD_440nm == -999, NA)) %>%
+  mutate(AOD_380nm = replace(AOD_380nm, AOD_380nm == -999, NA)) %>%
+  mutate(AOD_340nm = replace(AOD_340nm, AOD_340nm == -999, NA))
+
+# Collecting needed columns
+testdf <- hourly.AOD.AMES.14_17[, c(1,2,5:7,10,19,22,25,26,114)]
+
+ggplot(subset(testdf, Date.Local > "2015-08-15" & Date.Local < "2015-09-13")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_1640nm, color = "AOD_1640nm")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_1020nm, color = "AOD_1020nm")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_870nm, color = "AOD_870nm")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_675nm, color = "AOD_675nm")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_500nm, color = "AOD_500nm")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_440nm, color = "AOD_440nm")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_380nm, color = "AOD_380nm")) +
+  geom_point(aes(x = DateTime.Local, y = AOD_340nm, color = "AOD_340nm"))
 
 #--------------------------------------------------------------#
 # Functions
