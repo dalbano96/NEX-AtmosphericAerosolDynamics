@@ -39,7 +39,9 @@ hourly.AOD.AMES.14_17$Date.dd.mm.yyyy. <- as.Date(hourly.AOD.AMES.14_17$Date.dd.
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Date.Local = Date.dd.mm.yyyy.)
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.Local = Time.hh.mm.ss.)
 
-pm25.AOD.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.AOD.AMES.14_17)
+# Joining date and time into single column
+hourly.AOD.AMES.14_17$DateTime.Local <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.Local, hourly.AOD.AMES.14_17$Time.Local), format = "%Y-%m-%d %H:%M:%S")
+hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.Local, hourly.pm25.FRM.14_17$Time.Local), format = "%Y-%m-%d %H:%M")
 
 #--------------------------------------------------------------#
 # Functions
@@ -108,8 +110,9 @@ sf_oak.method.code = 170
 sf_oak.plot.linechart <- plot.linechart(sf_oak.sites, observed.date, sf_oak.method.code)
 sf_oak.plot.linechart
 
-ggplot(data = subset(sf_oak.sites, Date.Local > "2015-09-01" & Date.Local < "2015-09-08" & Method.Code == 170)) +
-  geom_point(mapping = aes(x = Time.Local, y = Sample.Measurement, color = Date.Local)) +
+ggplot(data = subset(hourly.AOD.AMES.14_17, as.character(Date.Local) > "2015-09-01" & as.character(Date.Local) < "2015-09-08")) +
+  geom_point(data = subset(sf_oak.sites, Date.Local > "2015-09-01" & Date.Local < "2015-09-08" & Method.Code == 170), 
+             mapping = aes(x = Time.Local, y = Sample.Measurement, color = as.character(Date.Local))) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 #--------------------------------------------------------------#
