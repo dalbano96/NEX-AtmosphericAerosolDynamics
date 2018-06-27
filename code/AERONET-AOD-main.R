@@ -51,9 +51,10 @@ hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
 # Graph!
 hourly.AOD.AMES.14_17 %>%
   na.omit() %>%
-  subset(DateTime.GMT >= "2015-01-01 00:00" & DateTime.GMT <= "2015-12-31 23:59") %>%
+  subset(DateTime.GMT >= "2015-10-01 00:00" & DateTime.GMT <= "2015-10-31 23:59") %>%
   ggplot(aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
-    geom_point()
+  geom_point(aes(color = as.character(Date.GMT), group = as.character(Date.GMT))) +
+  geom_smooth()
 
 
 # Collecting needed columns

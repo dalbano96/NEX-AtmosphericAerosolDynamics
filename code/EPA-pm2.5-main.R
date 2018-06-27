@@ -57,10 +57,10 @@ sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
 
 # Plot site data
 sf_oak.method.code = 170
-sf_oak.plot.linechart <- plot.linechart(sf_oak.sites, 
+sf_oak.plot.linechart.pm25 <- plot.linechart.pm25(sf_oak.sites, 
                                         observed.date, 
                                         sf_oak.method.code)
-sf_oak.plot.linechart
+sf_oak.plot.linechart.pm25
 
 #--------------------------------------------------------------#
 # # Hourly Data of New York City region
