@@ -18,7 +18,10 @@ library(lubridate)
 library(reshape2)
 
 #--------------------------------------------------------------#
-# Functions
+# @param
+#   data - dataframe
+#   data.date - date to analyze
+#   data.method.code - method code to analyze
 #--------------------------------------------------------------#
 plot.linechart <- function(data, data.date, data.method.code) {
   data %>%
