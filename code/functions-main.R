@@ -21,19 +21,16 @@ library(reshape2)
 # @desc: Plots linechart for hourly trends of single day
 #   for pm2.5
 # @param:
-#   data - dataframe
-#   data.date - date to analyze
-#   data.method.code - method code to analyze
 #--------------------------------------------------------------#
-plot.linechart.pm25 <- function(data, data.date, data.method.code) {
+plot.linechart.pm25 <- function(data, start.time, end.time, data.method.code) {
   data %>%
-    subset(Date.Local == data.date & Method.Code == data.method.code) %>%
-    ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
-    geom_line() +
+    subset(DateTime.Local >= start.time & DateTime.Local <= end.time  & Method.Code == data.method.code) %>%
+    ggplot(aes(x = DateTime.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
+    geom_point() +
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(x = "Local time", y = "Micrograms/cubic meter", color = "Sites") +
-    ggtitle(paste0(data.date, ", ", data$State.Name, ", Method Code: ", data.method.code))
+    labs(x = "Date/Time", y = "Micrograms/cubic meter", color = "Sites")
+    # ggtitle(paste0(data.date, ", ", data$State.Name, ", Method Code: ", data.method.code))
 }
 
 plot.linechart.AOD <- function(data, start.time, end.time) {

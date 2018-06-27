@@ -63,6 +63,22 @@ sf_oak.plot.linechart.pm25 <- plot.linechart.pm25(sf_oak.sites,
 sf_oak.plot.linechart.pm25
 
 #--------------------------------------------------------------#
+# Hourly Data of Reno, NV
+#--------------------------------------------------------------#
+rn.sites <- subset(hourly.pm25.FRM.14_17,
+                  (Site.Num == 16 |
+                     Site.Num == 22 |
+                     Site.Num == 1005 |
+                     Site.Num == 1007) &
+                    (County.Name == "Washoe"))
+rn.method.code = 170
+rn.plot.linechart.pm25 <- plot.linechart.pm25(rn.sites,
+                                              "2017-01-01", 
+                                              "2017-12-31",
+                                              rn.method.code)
+rn.plot.linechart.pm25
+
+#--------------------------------------------------------------#
 # # Hourly Data of New York City region
 # #--------------------------------------------------------------#
 # # Extract data from local sites
