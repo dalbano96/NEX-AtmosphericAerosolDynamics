@@ -20,29 +20,23 @@ library(reshape2)
 #--------------------------------------------------------------#
 # Read AOD csv to data frame
 #--------------------------------------------------------------#
-# 1) importing AOD datasets
+# 1) Importing AOD datasets
 hourly.AOD.AMES.14_17 <- NULL
 hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_20171231_NASA_Ames.csv", stringsAsFactors = FALSE)
 
-# 2) Change date format of Date.GMT. Corrects to "yyyy-mm-dd"
+# 2) Changing date format of Date.GMT. Corrects to "yyyy-mm-dd"
 hourly.AOD.AMES.14_17$Date.dd.mm.yyyy. <- as.Date(hourly.AOD.AMES.14_17$Date.dd.mm.yyyy., format = "%m/%d/%y")
 
-# 3) Rename date/time columns to Date.GMT and Time.GMT since those units were measured
+# 3) Rename date/time columns to Date.GMT and Time.GMT since those units were measured in GMT time zone
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Date.GMT = Date.dd.mm.yyyy.)
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.GMT = Time.hh.mm.ss.)
 
-# 4) Removes minutes and seconds from Time.GMT to show only its hour
-hourly.AOD.AMES.14_17$Time.GMT <- strptime(hourly.AOD.AMES.14_17$Time.GMT, format = "%H")
-
-# 5) Removes date portion and formats Time.GMT as character type
-hourly.AOD.AMES.14_17$Time.GMT <- format(hourly.AOD.AMES.14_17$Time.GMT, format = "%H:%M:%S")
-
-# 6) Joining date and time into a new column
+# 4) Joining date and time into a new column "DateTime.GMT"
 hourly.AOD.AMES.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.GMT,
                                                        hourly.AOD.AMES.14_17$Time.GMT),
-                                                 format = "%Y-%m-%d %H")
+                                                 format = "%Y-%m-%d %H:%M:%S")
 
-# 7) Setting all -999 to NA TODO: There has to be a better way to format this.
+# 5) Setting all -999 to NA TODO: There has to be a better way to format this.
 hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
   mutate(AOD_1640nm = replace(AOD_1640nm, AOD_1640nm == -999, NA)) %>%
   mutate(AOD_1020nm = replace(AOD_1020nm, AOD_1020nm == -999, NA)) %>%
@@ -54,9 +48,10 @@ hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
   mutate(AOD_340nm = replace(AOD_340nm, AOD_340nm == -999, NA)) %>%
   mutate(X440.870_Angstrom_Exponent = replace(X440.870_Angstrom_Exponent, X440.870_Angstrom_Exponent == -999, NA))
 
+# Graph!
 hourly.AOD.AMES.14_17 %>%
   na.omit() %>%
-  subset(DateTime.GMT >= "2015-08-01" & DateTime.GMT <= "2015-12-31") %>%
+  subset(DateTime.GMT >= "2015-01-01 00:00" & DateTime.GMT <= "2015-12-31 23:59") %>%
   ggplot(aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
     geom_point()
 
