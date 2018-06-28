@@ -4,6 +4,7 @@
 # Summer 2018
 # Atmospheric Aerosol Dynamics
 # EPA-pm2.5-main.R
+# Desc - Loads and tidys EPA PM2.5 data
 #--------------------------------------------------------------#
 
 library(dplyr)

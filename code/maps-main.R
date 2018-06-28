@@ -4,6 +4,7 @@
 # Summer 2018
 # Atmospheric Aerosol Dynamics
 # maps-main.R
+# Desc - Loads map data with site information for EPA and AERONET
 #--------------------------------------------------------------#
 
 library(dplyr)

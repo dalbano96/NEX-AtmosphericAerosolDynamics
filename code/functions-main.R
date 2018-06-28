@@ -4,6 +4,7 @@
 # Summer 2018
 # Atmospheric Aerosol Dynamics
 # functions-main.R
+# Desc - Holds general plotting functions
 #--------------------------------------------------------------#
 
 library(dplyr)

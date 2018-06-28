@@ -4,6 +4,7 @@
 # Summer 2018
 # Atmospheric Aerosol Dynamics
 # AERONET-AOD-main.R
+# Desc - Loads and tidys AERONET data
 #--------------------------------------------------------------#
 
 library(dplyr)

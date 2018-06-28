@@ -4,6 +4,7 @@
 # Summer 2018
 # Atmospheric Aerosol Dynamics
 # meteorological-main.R
+# Desc - Loads meteorological data
 #--------------------------------------------------------------#
 
 library(dplyr)
