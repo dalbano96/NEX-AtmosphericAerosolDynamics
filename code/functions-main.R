@@ -26,7 +26,7 @@ plot.linechart.pm25 <- function(data, start.time, end.time, data.method.code) {
   data %>%
     subset(DateTime.Local >= start.time & DateTime.Local <= end.time  & Method.Code == data.method.code) %>%
     ggplot(aes(x = DateTime.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
-    geom_point() +
+    geom_point(position = position_dodge(width = 0.75)) +
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Date/Time", y = "Micrograms/cubic meter", color = "Sites")

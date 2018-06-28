@@ -40,11 +40,6 @@ hourly.pm25.FRM.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Dat
 
 
 #--------------------------------------------------------------#
-# Date to observe (2014-01-01 to 2017-12-31)
-#--------------------------------------------------------------#
-observed.date <- "2016-09-22"
-
-#--------------------------------------------------------------#
 # Hourly Data of San Francisco-Oakland region
 #--------------------------------------------------------------#
 # Extract data from local sites
@@ -58,13 +53,14 @@ sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
 # Plot site data
 sf_oak.method.code = 170
 sf_oak.plot.linechart.pm25 <- plot.linechart.pm25(sf_oak.sites, 
-                                        observed.date, 
+                                        "2017-01-01", "2017-12-31", 
                                         sf_oak.method.code)
 sf_oak.plot.linechart.pm25
 
 #--------------------------------------------------------------#
 # Hourly Data of Reno, NV
 #--------------------------------------------------------------#
+# Site 22 missing from year > 2015
 rn.sites <- subset(hourly.pm25.FRM.14_17,
                   (Site.Num == 16 |
                      Site.Num == 22 |
@@ -73,8 +69,8 @@ rn.sites <- subset(hourly.pm25.FRM.14_17,
                     (County.Name == "Washoe"))
 rn.method.code = 170
 rn.plot.linechart.pm25 <- plot.linechart.pm25(rn.sites,
-                                              "2017-01-01", 
-                                              "2017-12-31",
+                                              "2015-01-01", 
+                                              "2015-12-31",
                                               rn.method.code)
 rn.plot.linechart.pm25
 
