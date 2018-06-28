@@ -3,7 +3,7 @@
 # NEX - NASA Ames
 # Summer 2018
 # Atmospheric Aerosol Dynamics
-# functions-main.R
+# plot_functions.R
 # Desc - Holds general plotting functions
 #--------------------------------------------------------------#
 

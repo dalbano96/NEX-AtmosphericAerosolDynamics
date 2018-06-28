@@ -106,11 +106,16 @@ hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
   mutate(X440.870_Angstrom_Exponent = replace(X440.870_Angstrom_Exponent, X440.870_Angstrom_Exponent == -999, NA))
 
 # Graph!
+start.date <- "2014-01-01 00:00"
+end.date <- "2017-12-31 23:59"
+
 hourly.AOD.Reno.14_17 %>%
   na.omit() %>%
-  subset(DateTime.GMT >= "2015-08-01 00:00" & DateTime.GMT <= "2015-12-31 23:59") %>%
-  ggplot(aes(x = Time.GMT, y = X440.870_Angstrom_Exponent)) +
-  geom_point(aes(group = as.character(Date.GMT)))
+  subset(DateTime.GMT >= start.date & DateTime.GMT <= end.date) %>%
+  ggplot(aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
+  geom_point() +
+  xlab("Time") +
+  ggtitle(paste0("University of Nevada at Reno", " [", start.date, " to ", end.date, "]"))
 
 
 # # Graph of AOD

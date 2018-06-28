@@ -3,7 +3,7 @@
 # NEX - NASA Ames
 # Summer 2018
 # Atmospheric Aerosol Dynamics
-# maps-main.R
+# map_functions.R
 # Desc - Loads map data with site information for EPA and AERONET
 #--------------------------------------------------------------#
 
@@ -42,4 +42,6 @@ leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longi
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron) %>%
   addScaleBar()
+
+
 
