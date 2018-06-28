@@ -17,6 +17,8 @@ library(sp)
 library(lubridate)
 library(reshape2)
 
+aeronet.sites <- read.delim("data/aeronet_locations_v3_2015_lev20.txt", header = TRUE, sep = ",")
+
 #--------------------------------------------------------------#
 # Map all site locations
 # PM2.5 FRM/FEM data
@@ -28,14 +30,14 @@ leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longi
              label = ~paste("Site Num: ", Site.Num, ", ",
                             "County Name: ", County.Name, ", ",
                             "Method Code: ", Method.Code)) %>%
-  addCircles(data = unique(select(hourly.AOD.AMES.14_17, 
-                                  c(Site_Latitude.Degrees.,
-                                    Site_Longitude.Degrees., 
-                                    AERONET_Site_Name))),
-             lng = ~Site_Longitude.Degrees.,
-             lat = ~Site_Latitude.Degrees.,
+  addCircles(data = unique(select(aeronet.sites, 
+                                  c(Longitude.decimal_degrees.,
+                                    Latitude.decimal_degrees.,
+                                    Site_Name))),
+             lng = ~Longitude.decimal_degrees.,
+             lat = ~Latitude.decimal_degrees.,
              color = "red",
-             label = ~paste("Site Name: ", AERONET_Site_Name)) %>%
+             label = ~paste("Site Name: ", Site_Name)) %>%
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron) %>%
   addScaleBar()
