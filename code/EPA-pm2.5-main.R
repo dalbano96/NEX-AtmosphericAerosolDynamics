@@ -53,20 +53,16 @@ hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$D
 #--------------------------------------------------------------#
 # Hourly Data of San Francisco-Oakland region
 #--------------------------------------------------------------#
-# Extract data from local sites
-sf_oak.sites <- subset(hourly.pm25.FRM.14_17,
-                  (Site.Num == 5 |
-                     Site.Num == 1001 |
-                     Site.Num == 6) &
-                    (County.Name == "San Mateo" |
-                       County.Name == "Santa Clara"))
+sf.site.num_list <- c(5, 1001, 6)
+sf.site.county_name_list <- c("San Mateo", "Santa Clara")
+sf.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% sf.site.num_list &
+                       County.Name %in% sf.site.county_name_list)
 
-# Plot site data
-sf_oak.method.code = 170
-sf_oak.plot.linechart.pm25 <- plot.linechart.pm25(sf_oak.sites, 
-                                        "2017-01-01", "2017-12-31", 
-                                        sf_oak.method.code)
-sf_oak.plot.linechart.pm25
+sf.method.code <- 170
+sf.start_date <- "2016-01-01"
+sf.end_date <- "2016-12-31"
+sf.plot.linechart.pm25 <- plot.linechart.pm25(sf.sites,sf.start_date, sf.end_date, sf.method.code)
+sf.plot.linechart.pm25
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
@@ -80,8 +76,8 @@ reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num
 reno.method.code <- 170
 reno.start_date <- "2016-01-01"
 reno.end_date <- "2016-12-31"
-rn.plot.linechart.pm25 <- plot.linechart.pm25(reno.sites,reno.start_date, reno.end_date, reno.method.code)
-rn.plot.linechart.pm25
+reno.plot.linechart.pm25 <- plot.linechart.pm25(reno.sites,reno.start_date, reno.end_date, reno.method.code)
+reno.plot.linechart.pm25
 
 #--------------------------------------------------------------#
 # # Hourly Data of New York City region
