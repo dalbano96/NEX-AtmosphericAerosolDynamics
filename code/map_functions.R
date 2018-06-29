@@ -7,17 +7,6 @@
 # Desc - Loads map data with site information for EPA and AERONET
 #--------------------------------------------------------------#
 
-library(dplyr)
-library(ggplot2)
-library(ggthemes)
-library(scales)
-library(tidyverse)
-library(geojsonR)
-library(leaflet)
-library(sp)
-library(lubridate)
-library(reshape2)
-
 aeronet.sites <- read.delim("data/aeronet_locations_v3_2015_lev20.txt", header = TRUE, sep = ",")
 
 #--------------------------------------------------------------#
@@ -26,11 +15,10 @@ aeronet.sites <- read.delim("data/aeronet_locations_v3_2015_lev20.txt", header =
 # Method.Code - 170
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
-leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longitude, Latitude, Site.Num, County.Name, Method.Code)))) %>%
+leaflet(unique(select(subset(hourly.pm25.FRM.14_17), c(Longitude, Latitude, Site.Num, County.Name)))) %>%
   addCircles(~Longitude, ~Latitude,
              label = ~paste("Site Num: ", Site.Num, ", ",
-                            "County Name: ", County.Name, ", ",
-                            "Method Code: ", Method.Code)) %>%
+                            "County Name: ", County.Name)) %>%
   addCircles(data = unique(select(aeronet.sites, 
                                   c(Longitude.decimal_degrees.,
                                     Latitude.decimal_degrees.,
@@ -43,5 +31,8 @@ leaflet(unique(select(subset(hourly.pm25.FRM.14_17, Method.Code == 170), c(Longi
   addProviderTiles(providers$CartoDB.Positron) %>%
   addScaleBar()
 
+get.summary <- function(site_num, county_name) {
+  summary(subset(hourly.pm25.FRM.14_17, Site.Num = site_num, County.Name = county_name))
+}
 
-
+get.summary(1001, "San Mateo")

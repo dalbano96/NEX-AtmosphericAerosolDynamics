@@ -7,17 +7,6 @@
 # Desc - Holds general plotting functions
 #--------------------------------------------------------------#
 
-library(dplyr)
-library(ggplot2)
-library(ggthemes)
-library(scales)
-library(tidyverse)
-library(geojsonR)
-library(leaflet)
-library(sp)
-library(lubridate)
-library(reshape2)
-
 #--------------------------------------------------------------#
 # @desc: Plots linechart for hourly trends of single day
 #   for pm2.5

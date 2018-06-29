@@ -7,17 +7,6 @@
 # Desc - Loads and tidys AERONET data
 #--------------------------------------------------------------#
 
-library(dplyr)
-library(ggplot2)
-library(ggthemes)
-library(scales)
-library(tidyverse)
-library(geojsonR)
-library(leaflet)
-library(sp)
-library(lubridate)
-library(reshape2)
-
 #--------------------------------------------------------------#
 # Read AOD csv to data frame
 #--------------------------------------------------------------#
@@ -106,12 +95,12 @@ hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
   mutate(X440.870_Angstrom_Exponent = replace(X440.870_Angstrom_Exponent, X440.870_Angstrom_Exponent == -999, NA))
 
 # Graph!
-start.date <- "2014-01-01 00:00"
+start.date <- "2017-01-01 00:00"
 end.date <- "2017-12-31 23:59"
 
 hourly.AOD.Reno.14_17 %>%
   na.omit() %>%
-  subset(DateTime.GMT >= start.date & DateTime.GMT <= end.date) %>%
+  subset(DateTime.GMT >= start.date & DateTime.GMT <= end.date & X440.870_Angstrom_Exponent >= 0.00) %>%
   ggplot(aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
   geom_point() +
   xlab("Time") +

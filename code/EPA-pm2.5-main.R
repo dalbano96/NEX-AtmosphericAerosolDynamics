@@ -7,17 +7,6 @@
 # Desc - Loads and tidys EPA PM2.5 data
 #--------------------------------------------------------------#
 
-library(dplyr)
-library(ggplot2)
-library(ggthemes)
-library(scales)
-library(tidyverse)
-library(geojsonR)
-library(leaflet)
-library(sp)
-library(lubridate)
-library(reshape2)
-
 #--------------------------------------------------------------#
 # Read EPA csv to data frame
 #--------------------------------------------------------------#
@@ -74,8 +63,8 @@ reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num
                        County.Name %in% reno.site.county_name_list)
 
 reno.method.code <- 170
-reno.start_date <- "2016-01-01"
-reno.end_date <- "2016-12-31"
+reno.start_date <- "2017-01-01"
+reno.end_date <- "2017-12-31"
 reno.plot.linechart.pm25 <- plot.linechart.pm25(reno.sites,reno.start_date, reno.end_date, reno.method.code)
 reno.plot.linechart.pm25
 
