@@ -49,4 +49,3 @@ get.site_methods(1007, "Washoe")
 tempdf <- bind_rows(subset(hourly.pm25.FRM.14_17, Site.Num == 16 & County.Name == "Washoe"),
                     subset(hourly.pm25.FRM.14_17, Site.Num == 22 & County.Name == "Washoe"))
 tempdf %>%
-  ggplot

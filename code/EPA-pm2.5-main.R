@@ -59,13 +59,10 @@ sf.plot.linechart.pm25
 # Site 22 missing from year > 2015
 reno.site.num_list <- c(16, 22, 1005, 1007)
 reno.site.county_name_list <- c("Washoe")
-reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list &
-                       County.Name %in% reno.site.county_name_list)
-
 reno.method.code <- 170
 reno.start_date <- "2017-01-01"
 reno.end_date <- "2017-12-31"
-reno.plot.linechart.pm25 <- plot.linechart.pm25(reno.sites,reno.start_date, reno.end_date, reno.method.code)
+reno.plot.linechart.pm25 <- plot.linechart.pm25(reno.start_date, reno.end_date, reno.method.code, reno.site.num_list, reno.site.county_name_list)
 reno.plot.linechart.pm25
 
 #--------------------------------------------------------------#
