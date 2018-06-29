@@ -30,8 +30,8 @@ plot.linechart.pm25 <- function(data, start.time, end.time, data.method.code) {
     geom_point(position = position_dodge(width = 0.75)) +
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(x = "Date/Time", y = "Micrograms/cubic meter", color = "Sites")
-    # ggtitle(paste0(data.date, ", ", data$State.Name, ", Method Code: ", data.method.code))
+    labs(x = "Date/Time", y = "Micrograms/cubic meter", color = "Sites") +
+    ggtitle(paste0(data$State.Name, " [", start.time, " - ", end.time, "] ", "Method Code: ", data.method.code))
 }
 
 plot.linechart.AOD <- function(data, start.time, end.time) {

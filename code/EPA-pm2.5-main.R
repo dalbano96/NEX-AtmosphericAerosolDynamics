@@ -21,10 +21,17 @@ library(reshape2)
 #--------------------------------------------------------------#
 # Read EPA csv to data frame
 #--------------------------------------------------------------#
-hourly.pm25.FRM.2014 <- read.csv("data/hourly_88101_2014.csv", stringsAsFactors = FALSE)
-hourly.pm25.FRM.2015 <- read.csv("data/hourly_88101_2015.csv", stringsAsFactors = FALSE)
-hourly.pm25.FRM.2016 <- read.csv("data/hourly_88101_2016.csv", stringsAsFactors = FALSE)
-hourly.pm25.FRM.2017 <- read.csv("data/hourly_88101_2017.csv", stringsAsFactors = FALSE)
+read_EPA_csv <- function(filename) {
+  df <- NULL
+  df <- read.csv(filename, stringsAsFactors = FALSE)
+  df <- subset(df, Sample.Measurement >= 0.00)
+  return(df)
+}
+
+hourly.pm25.FRM.2014 <- read_EPA_csv("data/hourly_88101_2014.csv")
+hourly.pm25.FRM.2015 <- read_EPA_csv("data/hourly_88101_2015.csv")
+hourly.pm25.FRM.2016 <- read_EPA_csv("data/hourly_88101_2016.csv")
+hourly.pm25.FRM.2017 <- read_EPA_csv("data/hourly_88101_2017.csv")
 
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.2014, hourly.pm25.FRM.2015)
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2016)
@@ -39,6 +46,9 @@ hourly.pm25.FRM.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Dat
                                                        hourly.pm25.FRM.14_17$Time.GMT), 
                                                  format = "%Y-%m-%d %H:%M")
 
+hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.Local, 
+                                                       hourly.pm25.FRM.14_17$Time.Local), 
+                                                 format = "%Y-%m-%d %H:%M")
 
 #--------------------------------------------------------------#
 # Hourly Data of San Francisco-Oakland region
@@ -59,20 +69,18 @@ sf_oak.plot.linechart.pm25 <- plot.linechart.pm25(sf_oak.sites,
 sf_oak.plot.linechart.pm25
 
 #--------------------------------------------------------------#
-# Hourly Data of Reno, NV
+# Hourly PM2.5 Data of Reno, NV
 #--------------------------------------------------------------#
 # Site 22 missing from year > 2015
-rn.sites <- subset(hourly.pm25.FRM.14_17,
-                  (Site.Num == 16 |
-                     Site.Num == 22 |
-                     Site.Num == 1005 |
-                     Site.Num == 1007) &
-                    (County.Name == "Washoe"))
-rn.method.code = 170
-rn.plot.linechart.pm25 <- plot.linechart.pm25(rn.sites,
-                                              "2015-01-01", 
-                                              "2015-12-31",
-                                              rn.method.code)
+reno.site.num_list <- c(16, 22, 1005, 1007)
+reno.site.county_name_list <- c("Washoe")
+reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list &
+                       County.Name %in% reno.site.county_name_list)
+
+reno.method.code <- 170
+reno.start_date <- "2016-01-01"
+reno.end_date <- "2016-12-31"
+rn.plot.linechart.pm25 <- plot.linechart.pm25(reno.sites,reno.start_date, reno.end_date, reno.method.code)
 rn.plot.linechart.pm25
 
 #--------------------------------------------------------------#
