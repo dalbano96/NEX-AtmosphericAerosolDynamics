@@ -7,7 +7,15 @@
 # Desc - Loads map data with site information for EPA and AERONET
 #--------------------------------------------------------------#
 
-aeronet.sites <- read.delim("data/aeronet_locations_v3_2015_lev20.txt", header = TRUE, sep = ",")
+aeronet.site.txt <- c("data/aeronet_locations_v3_2014_lev20.txt", 
+                      "data/aeronet_locations_v3_2015_lev20.txt", 
+                      "data/aeronet_locations_v3_2016_lev20.txt",
+                      "data/aeronet_locations_v3_2017_lev20.txt")
+
+aod.2014 <- read.delim("data/aeronet_locations_v3_2014_lev20.txt", header = TRUE, sep = ",")
+aod.2015 <- read.delim("data/aeronet_locations_v3_2015_lev20.txt", header = TRUE, sep = ",")
+aod.2016 <- read.delim("data/aeronet_locations_v3_2016_lev20.txt", header = TRUE, sep = ",")
+aod.2017 <- read.delim("data/aeronet_locations_v3_2017_lev20.txt", header = TRUE, sep = ",")
 
 #--------------------------------------------------------------#
 # Map all site locations
@@ -19,7 +27,7 @@ leaflet(unique(select(subset(hourly.pm25.FRM.14_17), c(Longitude, Latitude, Site
   addCircles(~Longitude, ~Latitude,
              label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
                             "County Name: ", County.Name)) %>%
-  addCircles(data = unique(select(aeronet.sites, 
+  addCircles(data = unique(select(aod.2014, 
                                   c(Longitude.decimal_degrees.,
                                     Latitude.decimal_degrees.,
                                     Site_Name))),
@@ -31,6 +39,7 @@ leaflet(unique(select(subset(hourly.pm25.FRM.14_17), c(Longitude, Latitude, Site
   addProviderTiles(providers$CartoDB.Positron) %>%
   addScaleBar()
 
+# Get list of methods from site
 get.site_methods <- function(site_num, county_name) {
   unique(select(subset(hourly.pm25.FRM.14_17, Site.Num == site_num &
                 County.Name == county_name),
@@ -46,6 +55,3 @@ get.site_methods(22, "Washoe")
 get.site_methods(1005, "Washoe")
 get.site_methods(1007, "Washoe")
 
-tempdf <- bind_rows(subset(hourly.pm25.FRM.14_17, Site.Num == 16 & County.Name == "Washoe"),
-                    subset(hourly.pm25.FRM.14_17, Site.Num == 22 & County.Name == "Washoe"))
-tempdf %>%
