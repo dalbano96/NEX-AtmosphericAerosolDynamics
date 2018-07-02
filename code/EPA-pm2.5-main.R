@@ -8,7 +8,7 @@
 #--------------------------------------------------------------#
 
 #--------------------------------------------------------------#
-# Read EPA csv to data frame
+# Function to read CSV file
 #--------------------------------------------------------------#
 read_EPA_csv <- function(filename) {
   df <- NULL
@@ -17,23 +17,30 @@ read_EPA_csv <- function(filename) {
   return(df)
 }
 
+#--------------------------------------------------------------#
+# Read EPA csv to data frame
+#--------------------------------------------------------------#
+
+# 1) Input CSV file
 hourly.pm25.FRM.2014 <- read_EPA_csv("data/hourly_88101_2014.csv")
 hourly.pm25.FRM.2015 <- read_EPA_csv("data/hourly_88101_2015.csv")
 hourly.pm25.FRM.2016 <- read_EPA_csv("data/hourly_88101_2016.csv")
 hourly.pm25.FRM.2017 <- read_EPA_csv("data/hourly_88101_2017.csv")
 
+# 2) Combine data frames (2014-2017) into single dataframe
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.2014, hourly.pm25.FRM.2015)
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2016)
 hourly.pm25.FRM.14_17 <- bind_rows(hourly.pm25.FRM.14_17, hourly.pm25.FRM.2017)
 
-# Convert Date columns to date objects
+# 3) Convert Date columns to date objects
 hourly.pm25.FRM.14_17$Date.Local <- as.Date(hourly.pm25.FRM.14_17$Date.Local, format = "%F")
 hourly.pm25.FRM.14_17$Date.GMT <- as.Date(hourly.pm25.FRM.14_17$Date.GMT, format = "%F")
 
-# Joining date and time into single column
-hourly.pm25.FRM.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.GMT, 
+# 4) Joining date and time into single column for GMT and local
+# GMT time zone set for DateTime.GMT
+hourly.pm25.FRM.14_17$DateTime.GMT <- ymd_hms(as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.GMT, 
                                                        hourly.pm25.FRM.14_17$Time.GMT), 
-                                                 format = "%Y-%m-%d %H:%M")
+                                                 format = "%Y-%m-%d %H:%M"), tz = "GMT")
 
 hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.Local, 
                                                        hourly.pm25.FRM.14_17$Time.Local), 

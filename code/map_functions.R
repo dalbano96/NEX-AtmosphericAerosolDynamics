@@ -19,15 +19,13 @@ aod.2017 <- read.delim("data/aeronet_locations_v3_2017_lev20.txt", header = TRUE
 
 #--------------------------------------------------------------#
 # Map all site locations
-# PM2.5 FRM/FEM data
-# Method.Code - 170
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
 leaflet(unique(select(subset(hourly.pm25.FRM.14_17), c(Longitude, Latitude, Site.Num, County.Name)))) %>%
   addCircles(~Longitude, ~Latitude,
              label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
                             "County Name: ", County.Name)) %>%
-  addCircles(data = unique(select(aod.2014, 
+  addCircles(data = unique(select(aod.2017, 
                                   c(Longitude.decimal_degrees.,
                                     Latitude.decimal_degrees.,
                                     Site_Name))),

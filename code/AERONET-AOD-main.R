@@ -22,9 +22,13 @@ hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Date.GMT = Date.dd.mm.yyy
 hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.GMT = Time.hh.mm.ss.)
 
 # 4) Joining date and time into a new column "DateTime.GMT"
-hourly.AOD.AMES.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.GMT,
-                                                       hourly.AOD.AMES.14_17$Time.GMT),
-                                                 format = "%Y-%m-%d %H:%M:%S")
+# Setting to GMT time zone
+hourly.AOD.AMES.14_17$DateTime.GMT <- ymd_hms(as.POSIXct(paste(hourly.AOD.AMES.14_17$Date.GMT,
+                                                               hourly.AOD.AMES.14_17$Time.GMT),
+                                                         format = "%Y-%m-%d %H:%M:%S"), tz = "GMT")
+
+# Converting to local (PDT) time zone
+hourly.AOD.AMES.14_17$DateTime.Local <- with_tz(hourly.AOD.AMES.14_17$DateTime.GMT, tz = "America/Los_Angeles")
 
 # 5) Setting all -999 to NA TODO: There has to be a better way to format this.
 hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
