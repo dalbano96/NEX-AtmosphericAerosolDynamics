@@ -60,7 +60,7 @@ mv.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% mv.site.num_lis
 mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
 
 mv.start_date <- "2014-01-01"
-mv.end_date <- "2014-12-31"
+mv.end_date <- "2017-12-31"
 mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites,mv.start_date, mv.end_date)
 mv.plot.linechart.pm25
 

@@ -16,10 +16,11 @@ scatter.plot.pm25 <- function(data, start.time, end.time) {
   data %>%
     subset(DateTime.Local >= start.time & DateTime.Local <= end.time) %>%
     ggplot(aes(x = DateTime.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
-    geom_point(position = position_dodge(width = 0.75)) +
+    # geom_point(position = position_dodge(width = 0.75)) +
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Time", y = "Micrograms/cubic meter", color = "Sites") +
+    # scale_x_date(breaks = date_breaks("6 months"), labels = date_format("%b %y")) +
     ggtitle(paste0(data$State.Name, " [", start.time, " - ", end.time, "] ", "POC: ", data$POC))
 }
 
