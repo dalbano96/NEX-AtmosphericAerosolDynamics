@@ -7,15 +7,48 @@
 # Desc - Loads map data with site information for EPA and AERONET
 #--------------------------------------------------------------#
 
-aeronet.site.txt <- c("data/aeronet_locations_v3_2014_lev20.txt", 
-                      "data/aeronet_locations_v3_2015_lev20.txt", 
-                      "data/aeronet_locations_v3_2016_lev20.txt",
-                      "data/aeronet_locations_v3_2017_lev20.txt")
+add.year <- function(df, year) {
+  rep(year, nrow(df))
+}
+
+#--------------------------------------------------------------#
+# Load AERONET sites based on available AOD data by year
+#--------------------------------------------------------------#
+# aeronet.site.txt <- c("data/aeronet_locations_v3_2014_lev20.txt", 
+#                       "data/aeronet_locations_v3_2015_lev20.txt", 
+#                       "data/aeronet_locations_v3_2016_lev20.txt",
+#                       "data/aeronet_locations_v3_2017_lev20.txt")
 
 aod.2014 <- read.delim("data/aeronet_locations_v3_2014_lev20.txt", header = TRUE, sep = ",")
 aod.2015 <- read.delim("data/aeronet_locations_v3_2015_lev20.txt", header = TRUE, sep = ",")
 aod.2016 <- read.delim("data/aeronet_locations_v3_2016_lev20.txt", header = TRUE, sep = ",")
 aod.2017 <- read.delim("data/aeronet_locations_v3_2017_lev20.txt", header = TRUE, sep = ",")
+
+# head(aod.2014)
+# head(aod.2015)
+# head(aod.2016)
+# head(aod.2017)
+
+# Adds year column to df. Allows row binding
+aod.2014$year <- add.year(aod.2014, 2014)
+aod.2015$year <- add.year(aod.2015, 2015)
+aod.2016$year <- add.year(aod.2016, 2016)
+aod.2017$year <- add.year(aod.2017, 2017)
+
+# head(aod.2014)
+# head(aod.2015)
+# head(aod.2016)
+# head(aod.2017)
+
+# aod.by_year <- c(aod.2014, aod.2015, aod.2016, aod.2017)
+# aod.2014.new <- aod.2014
+# aod.2014.new$year <- rep(2014, nrow(aod.2014.new))
+
+# Combine all site locations to single df
+aod.sites <- NULL
+aod.sites <- bind_rows(aod.2014, aod.2015)
+aod.sites <- bind_rows(aod.sites, aod.2016)
+aod.sites <- bind_rows(aod.sites, aod.2017)
 
 #--------------------------------------------------------------#
 # Map all site locations
@@ -25,7 +58,7 @@ leaflet(unique(select(subset(hourly.pm25.FRM.14_17), c(Longitude, Latitude, Site
   addCircles(~Longitude, ~Latitude,
              label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
                             "County Name: ", County.Name)) %>%
-  addCircles(data = unique(select(aod.2017, 
+  addCircles(data = unique(select(aod.sites, 
                                   c(Longitude.decimal_degrees.,
                                     Latitude.decimal_degrees.,
                                     Site_Name))),

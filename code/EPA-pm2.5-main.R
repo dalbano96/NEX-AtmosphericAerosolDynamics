@@ -51,8 +51,10 @@ hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$D
 #--------------------------------------------------------------#
 sf.site.num_list <- c(5, 1001, 6)
 sf.site.county_name_list <- c("San Mateo", "Santa Clara")
-sf.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% sf.site.num_list &
-                       County.Name %in% sf.site.county_name_list)
+sf.site.state_name <- "California"
+sf.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% sf.site.num_list & 
+                     County.Name %in% sf.site.county_name_list &
+                     State.Name == sf.site.state_name)
 sf.sites$DateTime.Local <- ymd_hms(sf.sites$DateTime.Local, tz = "America/Los_Angeles")
 
 sf.poc <- min(unique(sf.sites$POC))
@@ -67,12 +69,14 @@ sf.plot.linechart.pm25
 # Site 22 missing from year > 2015
 reno.site.num_list <- c(16, 22, 1005, 1007)
 reno.site.county_name_list <- c("Washoe")
-reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list &
-                       County.Name %in% reno.site.county_name_list)
+reno.site.state_name <- "Nevada"
+reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list & 
+                       County.Name %in% reno.site.county_name_list &
+                       State.Name == reno.site.state_name)
 reno.sites$DateTime.Local <- ymd_hms(reno.sites$DateTime.Local, tz = "America/Los_Angeles")
 
 reno.poc <- min(unique(reno.sites$POC))
-reno.start_date <- "2017-01-01"
+reno.start_date <- "2014-01-01"
 reno.end_date <- "2017-12-31"
 reno.plot.linechart.pm25 <- scatter.plot.pm25(reno.sites,reno.start_date, reno.end_date, reno.poc)
 reno.plot.linechart.pm25
