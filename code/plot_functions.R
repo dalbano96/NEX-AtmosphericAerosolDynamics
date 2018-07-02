@@ -23,6 +23,10 @@ scatter.plot.pm25 <- function(data, start.time, end.time, data.poc) {
     ggtitle(paste0(data$State.Name, " [", start.time, " - ", end.time, "] ", "POC: ", data.poc))
 }
 
+
+#--------------------------------------------------------------#
+# WORK IN PROGRESS
+#--------------------------------------------------------------#
 plot.linechart.AOD <- function(data, start.time, end.time) {
   data %>%
     na.omit %>%
