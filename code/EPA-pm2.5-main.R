@@ -47,21 +47,22 @@ hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$D
                                                  format = "%Y-%m-%d %H:%M")
 
 #--------------------------------------------------------------#
-# Hourly Data of San Francisco-Oakland region
+# Hourly Data of Mountain View, CA region
 #--------------------------------------------------------------#
-sf.site.num_list <- c(5, 1001, 6)
-sf.site.county_name_list <- c("San Mateo", "Santa Clara")
-sf.site.state_name <- "California"
-sf.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% sf.site.num_list & 
-                     County.Name %in% sf.site.county_name_list &
-                     State.Name == sf.site.state_name)
-sf.sites$DateTime.Local <- ymd_hms(sf.sites$DateTime.Local, tz = "America/Los_Angeles")
+mv.site.num_list <- c(5, 1001, 6)
+mv.site.county_name_list <- c("San Mateo", "Santa Clara")
+mv.site.state_name <- "California"
+mv.poc <- min(unique(mv.sites$POC))
+mv.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% mv.site.num_list & 
+                     County.Name %in% mv.site.county_name_list &
+                     State.Name == mv.site.state_name &
+                     POC == mv.poc)
+mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
 
-sf.poc <- min(unique(sf.sites$POC))
-sf.start_date <- "2016-01-01"
-sf.end_date <- "2016-12-31"
-sf.plot.linechart.pm25 <- scatter.plot.pm25(sf.sites,sf.start_date, sf.end_date, sf.poc)
-sf.plot.linechart.pm25
+mv.start_date <- "2014-01-01"
+mv.end_date <- "2014-12-31"
+mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites,mv.start_date, mv.end_date)
+mv.plot.linechart.pm25
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
@@ -70,15 +71,16 @@ sf.plot.linechart.pm25
 reno.site.num_list <- c(16, 22, 1005, 1007)
 reno.site.county_name_list <- c("Washoe")
 reno.site.state_name <- "Nevada"
+reno.poc <- min(unique(reno.sites$POC))
 reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list & 
                        County.Name %in% reno.site.county_name_list &
-                       State.Name == reno.site.state_name)
+                       State.Name == reno.site.state_name &
+                       POC == reno.poc)
 reno.sites$DateTime.Local <- ymd_hms(reno.sites$DateTime.Local, tz = "America/Los_Angeles")
 
-reno.poc <- min(unique(reno.sites$POC))
 reno.start_date <- "2014-01-01"
 reno.end_date <- "2017-12-31"
-reno.plot.linechart.pm25 <- scatter.plot.pm25(reno.sites,reno.start_date, reno.end_date, reno.poc)
+reno.plot.linechart.pm25 <- scatter.plot.pm25(reno.sites,reno.start_date, reno.end_date)
 reno.plot.linechart.pm25
 
 #--------------------------------------------------------------#
