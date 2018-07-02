@@ -51,7 +51,7 @@ aod.sites <- bind_rows(aod.sites, aod.2016)
 aod.sites <- bind_rows(aod.sites, aod.2017)
 
 #--------------------------------------------------------------#
-# Map all site locations
+# Map all site locations from 2014-2017
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
 leaflet(unique(select(subset(hourly.pm25.FRM.14_17), c(Longitude, Latitude, Site.Num, County.Name)))) %>%
@@ -69,6 +69,23 @@ leaflet(unique(select(subset(hourly.pm25.FRM.14_17), c(Longitude, Latitude, Site
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron) %>%
   addScaleBar()
+
+#--------------------------------------------------------------#
+# WORK IN PROGRESS
+# Map site locations based on specified date range
+# Used to determine site locations to analyze
+# THE PROBLEM IS FILTERING THE AOD SITES (by year, not date)
+#--------------------------------------------------------------#
+map_by_year <- function(df_pm, df_aod, start_date, end_date) {
+  leaflet(unique(select(subset(df_pm, 
+                               DateTime.Local >= start_date &
+                                 DateTime.Local <= end_date), 
+                        c(Longitude, Latitude, Site.Num, County.Name)))) %>%
+    addCircles(~Longitude, ~Latitude,
+               label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
+                              "County.Name: ", County.Name)) %>%
+    addCircles(data = unique(select(subset(aod.sites, ))))
+}
 
 # Get list of methods from site
 get.site_methods <- function(site_num, county_name) {
