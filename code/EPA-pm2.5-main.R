@@ -38,9 +38,9 @@ hourly.pm25.FRM.14_17$Date.GMT <- as.Date(hourly.pm25.FRM.14_17$Date.GMT, format
 
 # 4) Joining date and time into single column for GMT and local
 # GMT time zone set for DateTime.GMT
-hourly.pm25.FRM.14_17$DateTime.GMT <- ymd_hms(as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.GMT, 
+hourly.pm25.FRM.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.GMT, 
                                                        hourly.pm25.FRM.14_17$Time.GMT), 
-                                                 format = "%Y-%m-%d %H:%M"), tz = "GMT")
+                                                 format = "%Y-%m-%d %H:%M")
 
 hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$Date.Local, 
                                                        hourly.pm25.FRM.14_17$Time.Local), 
@@ -53,6 +53,7 @@ sf.site.num_list <- c(5, 1001, 6)
 sf.site.county_name_list <- c("San Mateo", "Santa Clara")
 sf.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% sf.site.num_list &
                        County.Name %in% sf.site.county_name_list)
+sf.sites$DateTime.Local <- ymd_hms(sf.sites$DateTime.Local, tz = "America/Los_Angeles")
 
 sf.method.code <- 170
 sf.start_date <- "2016-01-01"
@@ -68,6 +69,7 @@ reno.site.num_list <- c(16, 22, 1005, 1007)
 reno.site.county_name_list <- c("Washoe")
 reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list &
                        County.Name %in% reno.site.county_name_list)
+reno.sites$DateTime.Local <- ymd_hms(reno.sites$DateTime.Local, tz = "America/Los_Angeles")
 
 reno.method.code <- 170
 reno.start_date <- "2017-01-01"
