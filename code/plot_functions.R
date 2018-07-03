@@ -12,9 +12,8 @@
 #   for pm2.5
 # @param:
 #--------------------------------------------------------------#
-scatter.plot.pm25 <- function(data, start.time, end.time) {
+scatter.plot.pm25 <- function(data) {
   data %>%
-    subset(DateTime.Local >= start.time & DateTime.Local <= end.time) %>%
     ggplot(aes(x = DateTime.Local, 
                y = Sample.Measurement, 
                group = Site.Num, color = as.character(Site.Num))) +
@@ -23,9 +22,11 @@ scatter.plot.pm25 <- function(data, start.time, end.time) {
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Time", y = "Micrograms/cubic meter", color = "Sites") +
     # scale_x_date(breaks = date_breaks("6 months"), labels = date_format("%b %y")) +
-    ggtitle(paste0(data$State.Name, " [", start.time, " - ", end.time, "] ", "POC: ", data$POC))
+    ggtitle(paste0(data$State.Name, " [", 
+                   head(data$DateTime.Local, n = 1), " to ", 
+                   tail(data$DateTime.Local, n = 1), "] ", "POC: ", 
+                   data$POC))
 }
-
 
 #--------------------------------------------------------------#
 # WORK IN PROGRESS

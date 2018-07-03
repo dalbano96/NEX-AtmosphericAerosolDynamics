@@ -53,16 +53,43 @@ mv.site.num_list <- c(5, 1001, 6)
 mv.site.county_name_list <- c("San Mateo", "Santa Clara")
 mv.site.state_name <- "California"
 mv.poc <- min(unique(mv.sites$POC))
+
+mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
+mv.start_date <- "2014-01-01 00:00"
+mv.end_date <- "2014-01-01 23:00"
+
 mv.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% mv.site.num_list & 
                      County.Name %in% mv.site.county_name_list &
                      State.Name == mv.site.state_name &
-                     POC == mv.poc)
-mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
+                     POC == mv.poc &
+                     DateTime.Local >= mv.start_date &
+                     DateTime.Local <= mv.end_date)
 
-mv.start_date <- "2014-05-05 00:00"
-mv.end_date <- "2014-05-05 23:00"
-mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites,mv.start_date, mv.end_date)
+# Graph
+mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites)
 mv.plot.linechart.pm25
+
+# Calculates arithmetic mean
+mv.sites %>%
+  summarise_at(vars(Sample.Measurement), funs(mean))
+
+# Testing geometric means calculation for each hour in a give date range
+geometric_mean <- function(values) {
+  gmean <- prod(values) ^ (1 / length(values))
+  return(gmean)
+}
+
+# Filtering by hour
+tempdf <- NULL
+tempdf <- subset(mv.sites, Time.Local == "00:00")
+tempdf %>%
+  summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
+
+ggplot(tempdf, aes(x = Sample.Measurement)) +
+  geom_histogram(binwidth = 2)
+
+# mv.sites %>%
+#   summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
@@ -72,14 +99,18 @@ reno.site.num_list <- c(16, 22, 1005, 1007)
 reno.site.county_name_list <- c("Washoe")
 reno.site.state_name <- "Nevada"
 reno.poc <- min(unique(reno.sites$POC))
+
+reno.sites$DateTime.Local <- ymd_hms(reno.sites$DateTime.Local, tz = "America/Los_Angeles")
+reno.start_date <- "2014-01-01"
+reno.end_date <- "2017-12-31"
+
 reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list & 
                        County.Name %in% reno.site.county_name_list &
                        State.Name == reno.site.state_name &
-                       POC == reno.poc)
-reno.sites$DateTime.Local <- ymd_hms(reno.sites$DateTime.Local, tz = "America/Los_Angeles")
+                       POC == reno.poc &
+                       DateTime.Local >= reno.start_date &
+                       DateTime.Local <= reno.end_date)
 
-reno.start_date <- "2014-01-01"
-reno.end_date <- "2017-12-31"
 reno.plot.linechart.pm25 <- scatter.plot.pm25(reno.sites,reno.start_date, reno.end_date)
 reno.plot.linechart.pm25
 
