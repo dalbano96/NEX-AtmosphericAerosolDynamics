@@ -13,7 +13,7 @@
 read_EPA_csv <- function(filename) {
   df <- NULL
   df <- read.csv(filename, stringsAsFactors = FALSE)
-  df <- subset(df, Sample.Measurement >= 0.00)
+  df <- subset(df, Sample.Measurement > 0.00)
   return(df)
 }
 
@@ -94,8 +94,10 @@ ggplot(mv.sites, aes(x = Sample.Measurement)) +
 tempdf <- NULL
 tempdf <- subset(mv.sites, 
                  Time.Local == "00:00" & 
-                   Date.Local >= "2014-02-01" &
-                   Date.Local <= "2014-02-05")
+                   Date.Local >= "2015-02-01" &
+                   Date.Local <= "2015-02-28")
+
+# mv.sites.2014 <- data.frame(Month = months)
 
 # Arithmetic Mean
 tempdf %>%
