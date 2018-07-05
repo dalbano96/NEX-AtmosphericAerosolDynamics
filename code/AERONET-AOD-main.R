@@ -45,9 +45,11 @@ hourly.AOD.AMES.14_17 <- hourly.AOD.AMES.14_17 %>%
 # Graph!
 hourly.AOD.AMES.14_17 %>%
   na.omit() %>%
-  subset(DateTime.GMT >= "2015-08-01 00:00" & DateTime.GMT <= "2015-12-31 23:59") %>%
-  ggplot(aes(x = Time.GMT, y = X440.870_Angstrom_Exponent)) +
-  geom_point(aes(group = as.character(Date.GMT)))
+  subset(DateTime.GMT >= "2014-01-01 00:00" & DateTime.GMT <= "2017-12-31 23:59") %>%
+  ggplot(aes(x = DateTime.Local, y = X440.870_Angstrom_Exponent)) +
+  geom_point() +
+  xlab("Time") +
+  ggtitle(paste0("NASA Ames Research Center", " [", start.date, " to ", end.date, "]"))
 
 # Collecting needed columns
 testdf <- NULL
@@ -85,6 +87,8 @@ hourly.AOD.Reno.14_17 <- rename(hourly.AOD.Reno.14_17, Time.GMT = Time.hh.mm.ss.
 hourly.AOD.Reno.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.AOD.Reno.14_17$Date.GMT,
                                                        hourly.AOD.Reno.14_17$Time.GMT),
                                                  format = "%Y-%m-%d %H:%M:%S")
+# Converting to local (PDT) time zone
+hourly.AOD.Reno.14_17$DateTime.Local <- with_tz(hourly.AOD.Reno.14_17$DateTime.GMT, tz = "America/Los_Angeles")
 
 # 5) Setting all -999 to NA TODO: There has to be a better way to format this.
 hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
@@ -99,13 +103,13 @@ hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
   mutate(X440.870_Angstrom_Exponent = replace(X440.870_Angstrom_Exponent, X440.870_Angstrom_Exponent == -999, NA))
 
 # Graph!
-start.date <- "2017-01-01 00:00"
+start.date <- "2014-01-01 00:00"
 end.date <- "2017-12-31 23:59"
 
 hourly.AOD.Reno.14_17 %>%
   na.omit() %>%
   subset(DateTime.GMT >= start.date & DateTime.GMT <= end.date & X440.870_Angstrom_Exponent > 0.00) %>%
-  ggplot(aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
+  ggplot(aes(x = DateTime.Local, y = X440.870_Angstrom_Exponent)) +
   geom_point() +
   xlab("Time") +
   ggtitle(paste0("University of Nevada at Reno", " [", start.date, " to ", end.date, "]"))

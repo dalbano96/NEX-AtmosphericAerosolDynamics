@@ -62,7 +62,14 @@ mv.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% mv.site.num_lis
                      DateTime.Local >= mv.start_date &
                      DateTime.Local <= mv.end_date &
                      POC == mv.poc)
+
+# Set to local time zone
 mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
+
+# Parse Date.Local into month and year columns
+mv.sites <- mv.sites %>%
+  mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
+         Year.Local = year(Date.Local))
 
 # Graph
 mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites)
@@ -71,10 +78,22 @@ mv.plot.linechart.pm25
 # Testing geometric means calculation for each hour in a give date range
 geometric_mean <- function(values) {
   gmean <- prod(values) ^ (1 / length(values))
-  # groot <- sqrt(values)
-  # gmean <- prod(groot)
   return(gmean)
 }
+
+# Aggregating average hourly data per month
+mv.sites %>%
+  geometric_mean(select(filter(Year.Local == "2015" 
+                               & Month.Local == "January" 
+                               & Time.Local == "00:00"),
+                        Sample.Measurement))
+
+# TODO: Find a way to simplify this process instead of manually doing it
+mv.sites %>%
+  filter(Year.Local == "2015"
+         & Month.Local == "January"
+         & Time.Local == "00:00") %>%
+  summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
 
 # # Standard deviation
 # sd(mv.sites$Sample.Measurement)
@@ -95,13 +114,10 @@ geometric_mean <- function(values) {
 
 # Filtering by hour (Could also filter by date)
 tempdf <- NULL
-tempdf <- subset(mv.sites, 
-                 Time.Local == "00:00" & 
+tempdf <- subset(mv.sites,
+                 Time.Local == "00:00" &
                    Date.Local >= "2015-01-01" &
-                   Date.Local <= "2015-12-31")
-
-# Converts Date.Local column to char month label, and of type factor
-tempdf$Date.Local.Month <- (month(tempdf$Date.Local, label = TRUE, abbr = FALSE))
+                   Date.Local <= "2015-01-31")
 
 # Arithmetic Mean
 tempdf %>%
@@ -117,15 +133,6 @@ ggplot(tempdf, aes(x = Sample.Measurement)) +
   ggtitle(paste0(head(mv.sites$Date.Local, n = 1), " to ",
                  tail(mv.sites$Date.Local, n = 1)))
 
-# Aggregating average hourly data per month
-mv.sites.2014 <- data.frame(Months = months, Hours = hours, stringsAsFactors = FALSE)
-
-mv.sites.2014 %>%
-  for (month in Months) {
-    for (hour in Hours) {
-      subdf <- subset(mv.sites, Time.Local == hour)
-    }
-  }
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
