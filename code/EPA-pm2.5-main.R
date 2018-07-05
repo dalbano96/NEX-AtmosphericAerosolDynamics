@@ -82,8 +82,23 @@ geometric_mean <- function(values) {
 }
 
 # TODO: Find a way to simplify this process instead of manually doing it
+for (yr in unique(mv.sites$Year.Local)) {
+  for (mn in unique(mv.sites$Month.Local)) {
+    for (hr in unique(mv.sites$Time.Local)) {
+      mv.sites %>%
+        filter(Year.Local == yr
+               & Month.Local == mn
+               & Time.Local == hr) %>%
+        summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round
+    }
+  }
+}
+
+# Working on aggregation method
+ag <- aggregate(Sample.Measurement ~ Month.Local, mv.sites, mean)
+
 mv.sites %>%
-  filter(Year.Local == "2016"
+  filter(Year.Local == "2015"
          & Month.Local == "July"
          & Time.Local == "12:00") %>%
   summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)

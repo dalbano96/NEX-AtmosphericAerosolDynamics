@@ -55,9 +55,6 @@ aod.sites <- bind_rows(aod.sites, aod.2017)
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
 leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name)))) %>%
-  addCircles(~Longitude, ~Latitude,
-             label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
-                            "County Name: ", County.Name)) %>%
   addCircles(data = unique(select(aod.sites, 
                                   c(Longitude.decimal_degrees.,
                                     Latitude.decimal_degrees.,
@@ -67,6 +64,9 @@ leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, Co
              color = "red",
              radius = 5000,
              label = ~paste("[AERONET] Site Name: ", Site_Name)) %>%
+  addCircles(~Longitude, ~Latitude,
+             label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
+                            "County Name: ", County.Name)) %>%
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron) %>%
   addScaleBar()
@@ -89,9 +89,6 @@ map_by_year <- function(start_date, end_date, year) {
   leaflet(unique(select(subset(hourly.pm25.FRM.14_17,
                                DateTime.Local >= start_date & DateTime.Local <= end_date), 
                         c(Longitude, Latitude, Site.Num, County.Name)))) %>%
-    addCircles(~Longitude, ~Latitude,
-               label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
-                              "County Name: ", County.Name)) %>%
     addCircles(data = unique(select(subset(aod.sites, Year == year), 
                                     c(Longitude.decimal_degrees.,
                                       Latitude.decimal_degrees.,
@@ -101,6 +98,9 @@ map_by_year <- function(start_date, end_date, year) {
                color = "red",
                radius = 5000,
                label = ~paste("[AERONET] Site Name: ", Site_Name)) %>%
+    addCircles(~Longitude, ~Latitude,
+               label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
+                              "County Name: ", County.Name)) %>%
     addTiles() %>%
     addProviderTiles(providers$CartoDB.Positron) %>%
     addScaleBar()
@@ -119,12 +119,18 @@ get.POC <- function(site_num, county_name) {
          c(POC)))
 }
 
+# Mountain View, CA
 get.POC(1001, "San Mateo")
 get.POC(5, "Santa Clara")
 get.POC(6, "Santa Clara")
 
+# Reno, NV
 get.POC(16, "Washoe")
 get.POC(22, "Washoe")
 get.POC(1005, "Washoe")
 get.POC(1007, "Washoe")
 
+# Denver, CO
+get.POC(28, "Denver")
+get.POC(26, "Denver")
+get.POC(2, "Denver")
