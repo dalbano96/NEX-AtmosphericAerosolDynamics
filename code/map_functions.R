@@ -74,7 +74,16 @@ leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, Co
 # Map site locations based on specified date range
 # Used to determine site locations to analyze
 # THE PROBLEM IS FILTERING THE AOD SITES (by year, not date)
+# TODO: FIGURE OUT A WAY TO MANAGE OVERLAPPING POINTS
 #--------------------------------------------------------------#
+df <- unique(select(subset(hourly.pm25.FRM.14_17,
+                           DateTime.Local >= "2015-01-01" &
+                           DateTime.Local <= "2015-12-31"),
+                    c(Longitude, Latitude, Site.Num, County.Name, POC)))
+
+# Test
+head(unique(select(subset(hourly.pm25.FRM.14_17, Site.Num == 1002 & County.Name == "San Joaquin"), POC)), n = 9)
+
 map_by_year <- function(start_date, end_date, year) {
   leaflet(unique(select(subset(hourly.pm25.FRM.14_17,
                                DateTime.Local >= start_date & DateTime.Local <= end_date), 
@@ -93,7 +102,6 @@ map_by_year <- function(start_date, end_date, year) {
     addTiles() %>%
     addProviderTiles(providers$CartoDB.Positron) %>%
     addScaleBar()
-  
 }
 
 # View list of available sites for particular year
@@ -102,19 +110,19 @@ map_by_year("2015-01-01", "2015-12-31", "2015")
 map_by_year("2016-01-01", "2016-12-31", "2016")
 map_by_year("2017-01-01", "2017-12-31", "2017")
 
-# Get list of methods from site
-get.site_methods <- function(site_num, county_name) {
+# Get list of POC from site
+get.POC <- function(site_num, county_name) {
   unique(select(subset(hourly.pm25.FRM.14_17, Site.Num == site_num &
                 County.Name == county_name),
-         c(Site.Num, County.Name, Method.Code, Method.Type, Method.Name, POC)))
+         c(POC)))
 }
 
-get.site_methods(306, "San Bernardino")
-get.site_methods(5, "Santa Clara")
-get.site_methods(6, "Santa Clara")
+get.POC(1001, "San Mateo")
+get.POC(5, "Santa Clara")
+get.POC(6, "Santa Clara")
 
-get.site_methods(16, "Washoe")
-get.site_methods(22, "Washoe")
-get.site_methods(1005, "Washoe")
-get.site_methods(1007, "Washoe")
+get.POC(16, "Washoe")
+get.POC(22, "Washoe")
+get.POC(1005, "Washoe")
+get.POC(1007, "Washoe")
 

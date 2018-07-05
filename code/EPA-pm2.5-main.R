@@ -52,18 +52,17 @@ hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$D
 mv.site.num_list <- c(5, 1001, 6)
 mv.site.county_name_list <- c("San Mateo", "Santa Clara")
 mv.site.state_name <- "California"
-mv.poc <- min(unique(mv.sites$POC))
-
-mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
-mv.start_date <- "2015-01-01 00:00"
-mv.end_date <- "2015-12-31 23:00"
+mv.poc <- 3
+mv.start_date <- "2014-01-01 00:00"
+mv.end_date <- "2017-01-31 23:00"
 
 mv.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% mv.site.num_list & 
                      County.Name %in% mv.site.county_name_list &
                      State.Name == mv.site.state_name &
-                     POC == mv.poc &
                      DateTime.Local >= mv.start_date &
-                     DateTime.Local <= mv.end_date)
+                     DateTime.Local <= mv.end_date &
+                     POC == mv.poc)
+mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
 
 # Graph
 mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites)
@@ -72,32 +71,37 @@ mv.plot.linechart.pm25
 # Testing geometric means calculation for each hour in a give date range
 geometric_mean <- function(values) {
   gmean <- prod(values) ^ (1 / length(values))
+  # groot <- sqrt(values)
+  # gmean <- prod(groot)
   return(gmean)
 }
 
-# Standard deviation
-sd(mv.sites$Sample.Measurement)
-
-# Arithmetic Mean
-mv.sites %>%
-  summarise_at(vars(Sample.Measurement), funs(mean)) %>% round(3)
-
-# Geometric Mean
-mv.sites %>%
-  summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
-
-# Plot histogram
-ggplot(mv.sites, aes(x = Sample.Measurement)) +
-  geom_histogram(binwidth = 2)
+# # Standard deviation
+# sd(mv.sites$Sample.Measurement)
+# 
+# # Arithmetic Mean
+# mv.sites %>%
+#   summarise_at(vars(Sample.Measurement), funs(mean)) %>% round(3)
+# 
+# # Geometric Mean
+# mv.sites %>%
+#   summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
+# 
+# # Plot histogram
+# ggplot(mv.sites, aes(x = Sample.Measurement)) +
+#   geom_histogram(binwidth = 2) +
+#   ggtitle(paste0(head(mv.sites$DateTime.Local, n = 1), " to ",
+#                  tail(mv.sites$DateTime.Local, n = 1)))
 
 # Filtering by hour (Could also filter by date)
 tempdf <- NULL
 tempdf <- subset(mv.sites, 
                  Time.Local == "00:00" & 
-                   Date.Local >= "2015-02-01" &
-                   Date.Local <= "2015-02-28")
+                   Date.Local >= "2015-01-01" &
+                   Date.Local <= "2015-12-31")
 
-# mv.sites.2014 <- data.frame(Month = months)
+# Converts Date.Local column to char month label, and of type factor
+tempdf$Date.Local.Month <- (month(tempdf$Date.Local, label = TRUE, abbr = FALSE))
 
 # Arithmetic Mean
 tempdf %>%
@@ -109,7 +113,19 @@ tempdf %>%
 
 # Plot histogram
 ggplot(tempdf, aes(x = Sample.Measurement)) +
-  geom_histogram()
+  geom_histogram() +
+  ggtitle(paste0(head(mv.sites$Date.Local, n = 1), " to ",
+                 tail(mv.sites$Date.Local, n = 1)))
+
+# Aggregating average hourly data per month
+mv.sites.2014 <- data.frame(Months = months, Hours = hours, stringsAsFactors = FALSE)
+
+mv.sites.2014 %>%
+  for (month in Months) {
+    for (hour in Hours) {
+      subdf <- subset(mv.sites, Time.Local == hour)
+    }
+  }
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV

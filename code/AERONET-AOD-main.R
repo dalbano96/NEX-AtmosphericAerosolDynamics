@@ -104,7 +104,7 @@ end.date <- "2017-12-31 23:59"
 
 hourly.AOD.Reno.14_17 %>%
   na.omit() %>%
-  subset(DateTime.GMT >= start.date & DateTime.GMT <= end.date & X440.870_Angstrom_Exponent >= 0.00) %>%
+  subset(DateTime.GMT >= start.date & DateTime.GMT <= end.date & X440.870_Angstrom_Exponent > 0.00) %>%
   ggplot(aes(x = DateTime.GMT, y = X440.870_Angstrom_Exponent)) +
   geom_point() +
   xlab("Time") +
