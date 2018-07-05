@@ -81,18 +81,11 @@ geometric_mean <- function(values) {
   return(gmean)
 }
 
-# Aggregating average hourly data per month
-mv.sites %>%
-  geometric_mean(select(filter(Year.Local == "2015" 
-                               & Month.Local == "January" 
-                               & Time.Local == "00:00"),
-                        Sample.Measurement))
-
 # TODO: Find a way to simplify this process instead of manually doing it
 mv.sites %>%
-  filter(Year.Local == "2015"
-         & Month.Local == "January"
-         & Time.Local == "00:00") %>%
+  filter(Year.Local == "2016"
+         & Month.Local == "July"
+         & Time.Local == "12:00") %>%
   summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
 
 # # Standard deviation

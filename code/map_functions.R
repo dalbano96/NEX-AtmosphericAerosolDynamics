@@ -65,6 +65,7 @@ leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, Co
              lng = ~Longitude.decimal_degrees.,
              lat = ~Latitude.decimal_degrees.,
              color = "red",
+             radius = 5000,
              label = ~paste("[AERONET] Site Name: ", Site_Name)) %>%
   addTiles() %>%
   addProviderTiles(providers$CartoDB.Positron) %>%
@@ -98,6 +99,7 @@ map_by_year <- function(start_date, end_date, year) {
                lng = ~Longitude.decimal_degrees.,
                lat = ~Latitude.decimal_degrees.,
                color = "red",
+               radius = 5000,
                label = ~paste("[AERONET] Site Name: ", Site_Name)) %>%
     addTiles() %>%
     addProviderTiles(providers$CartoDB.Positron) %>%
