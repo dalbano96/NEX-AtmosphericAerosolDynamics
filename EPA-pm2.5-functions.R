@@ -30,11 +30,12 @@ filter.pm.data <- function(site_nums, county_names, state_name, poc, start_date,
 }
 
 #--------------------------------------------------------------#
-# @desc: Plots linechart for hourly trends of single day
+# TODO: allow it to plot from multiple sites
+# @desc: Plots PM data for a given time range
 #   for pm2.5
 # @param:
 #--------------------------------------------------------------#
-scatter.plot.pm25 <- function(data) {
+plot.pm <- function(data) {
   data %>%
     ggplot(aes(x = DateTime.Local, 
                y = Sample.Measurement, 
@@ -51,11 +52,12 @@ scatter.plot.pm25 <- function(data) {
 }
 
 #--------------------------------------------------------------#
-# @desc: Plots hourly PM averages for a monthly period
-#   within a year
+# TODO: allow it to plot from multiple sites
+# @desc: Plots hourly PM averages for a given monthly period
+#   of a given year
 # @param:
 #--------------------------------------------------------------#
-plot.ag <- function(data, year, months) {
+plot.pm.hourly_mean <- function(data, year, months) {
   data %>%
     subset(Year.Local == year
            & Month.Local %in% months) %>%

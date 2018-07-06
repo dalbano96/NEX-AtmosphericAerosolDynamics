@@ -50,30 +50,40 @@ hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$D
 #--------------------------------------------------------------#
 # Hourly Data of Mountain View, CA region
 #--------------------------------------------------------------#
-mv.site_nums <- c(5, 1001, 6)
-mv.county_names <- c("San Mateo", "Santa Clara")
-mv.state_name <- "California"
-mv.poc <- 3
-mv.start_date <- "2014-01-01 00:00"
-mv.end_date <- "2017-12-31 23:00"
-
-mv.pm_data <- filter.pm.data(mv.site_nums, mv.county_names, mv.state_name, mv.poc, mv.start_date, mv.end_date)
-
-# Graph
-mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites)
-mv.plot.linechart.pm25
-
-# Testing geometric means calculation for each hour in a give date range
-geometric_mean <- function(values) {
-  gmean <- prod(values) ^ (1 / length(values))
-  return(gmean)
+find.pm_data.mv <- function() {
+  # Specify observed site numbers
+  mv.site_nums <- c(5, 1001, 6)
+  
+  # Specify observed county names
+  mv.county_names <- c("San Mateo", "Santa Clara")
+  
+  # Specify observed State name
+  mv.state_name <- "California"
+  
+  # Specify observed POC
+  mv.poc <- 3
+  
+  # Specify observed start date/time
+  mv.start_date <- "2014-01-01 00:00"
+  
+  # Specify observed start date/time
+  mv.end_date <- "2017-12-31 23:00"
+  
+  # Filter data
+  return(filter.pm.data(mv.site_nums, 
+                 mv.county_names, 
+                 mv.state_name, mv.poc, 
+                 mv.start_date, 
+                 mv.end_date))
 }
 
+pm_data.mv <- find.pm_data.mv()
+
 # Calculate hourly average by month and by year
-ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, mv.sites, geometric_mean)
+mv.ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, pm_data.mv, geometric.mean)
 
 # Creates plot of hourly average by month and by year
-plot.ag(ag, "2015", c("January", "July", "December"))
+plot.pm.hourly_mean(mv.ag, "2015", c("January", "July", "December"))
 
 
 
@@ -173,15 +183,15 @@ unique(select(subset(hourly.pm25.FRM.14_17, State.Name == "New York"), POC))
 #                  Time.Local == "00:00" &
 #                    Date.Local >= "2015-01-01" &
 #                    Date.Local <= "2015-01-31")
-# 
+#
 # # Arithmetic Mean
 # tempdf %>%
 #   summarise_at(vars(Sample.Measurement), funs(mean)) %>% round(3)
-# 
+#
 # # Geometric Mean
 # tempdf %>%
 #   summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
-# 
+#
 # # Plot histogram
 # ggplot(tempdf, aes(x = Sample.Measurement)) +
 #   geom_histogram() +
