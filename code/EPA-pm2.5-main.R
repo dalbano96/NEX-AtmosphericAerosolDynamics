@@ -54,7 +54,7 @@ mv.site.county_name_list <- c("San Mateo", "Santa Clara")
 mv.site.state_name <- "California"
 mv.poc <- 3
 mv.start_date <- "2014-01-01 00:00"
-mv.end_date <- "2017-01-31 23:00"
+mv.end_date <- "2017-12-31 23:00"
 
 mv.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% mv.site.num_list & 
                      County.Name %in% mv.site.county_name_list &
@@ -95,8 +95,9 @@ for (yr in unique(mv.sites$Year.Local)) {
 }
 
 # Working on aggregation method
-ag <- aggregate(Sample.Measurement ~ Month.Local, mv.sites, mean)
+ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, mv.sites, geometric_mean)
 
+# some testing lol
 mv.sites %>%
   filter(Year.Local == "2015"
          & Month.Local == "July"
