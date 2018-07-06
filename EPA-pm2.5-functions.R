@@ -11,6 +11,51 @@
 # @desc:
 # @param:
 #--------------------------------------------------------------#
+load_all_csv.pm_data <- function() {
+  #--------------------------------------------------------------#
+  # Function to read CSV file
+  #--------------------------------------------------------------#
+  read_EPA_csv <- function(filename) {
+    df <- NULL
+    df <- read.csv(filename, stringsAsFactors = FALSE)
+    df <- subset(df, Sample.Measurement > 0.00)
+    return(df)
+  }
+  
+  #--------------------------------------------------------------#
+  # Read ALL hourly PM data to data frame from 2014-2017
+  #--------------------------------------------------------------#
+  # 1) Input CSV file
+  pm.2014 <- read_EPA_csv("data/hourly_88101_2014.csv")
+  pm.2015 <- read_EPA_csv("data/hourly_88101_2015.csv")
+  pm.2016 <- read_EPA_csv("data/hourly_88101_2016.csv")
+  pm.2017 <- read_EPA_csv("data/hourly_88101_2017.csv")
+  
+  # 2) Combine data frames (2014-2017) into single dataframe
+  pm.df <- bind_rows(pm.2014, pm.2015)
+  pm.df <- bind_rows(pm.df, pm.2016)
+  pm.df <- bind_rows(pm.df, pm.2017)
+  
+  # 3) Convert Date columns to date objects
+  pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
+  pm.df$Date.GMT <- as.Date(pm.df$Date.GMT, format = "%F")
+  
+  # 4) Joining date and time into single column for GMT and local
+  # GMT time zone set for DateTime.GMT
+  pm.df$DateTime.GMT <- as.POSIXct(paste(pm.df$Date.GMT, 
+                                         pm.df$Time.GMT), 
+                                   format = "%Y-%m-%d %H:%M")
+  
+  pm.df$DateTime.Local <- as.POSIXct(paste(pm.df$Date.Local, 
+                                           pm.df$Time.Local), 
+                                     format = "%Y-%m-%d %H:%M")
+  return(pm.df)
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
 filter.pm.data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone) {
   filtered_data <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
                        County.Name %in% county_names &
@@ -60,7 +105,7 @@ filter.pm_sites.reno <- function(start, end, poc) {
   # Filter data
   return(filter.pm.data(reno.site_nums, 
                         reno.county_names, 
-                        reno.state_name, mv.poc, 
+                        reno.state_name, reno.poc, 
                         reno.start_date, 
                         reno.end_date,
                         reno.timezone))
