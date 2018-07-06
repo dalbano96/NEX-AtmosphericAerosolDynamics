@@ -84,22 +84,11 @@ geometric_mean <- function(values) {
 # Filtering hourly average by month and by year
 ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, mv.sites, geometric_mean)
 
-# # Standard deviation
-# sd(mv.sites$Sample.Measurement)
-# 
-# # Arithmetic Mean
-# mv.sites %>%
-#   summarise_at(vars(Sample.Measurement), funs(mean)) %>% round(3)
-# 
-# # Geometric Mean
-# mv.sites %>%
-#   summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
-# 
-# # Plot histogram
-# ggplot(mv.sites, aes(x = Sample.Measurement)) +
-#   geom_histogram(binwidth = 2) +
-#   ggtitle(paste0(head(mv.sites$DateTime.Local, n = 1), " to ",
-#                  tail(mv.sites$DateTime.Local, n = 1)))
+ag %>%
+  subset(Year.Local == "2014"
+         & Month.Local == "January") %>%
+  ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
+  geom_point()
 
 # Filtering by hour (Could also filter by date)
 tempdf <- NULL
