@@ -18,9 +18,8 @@ read_EPA_csv <- function(filename) {
 }
 
 #--------------------------------------------------------------#
-# Read EPA csv to data frame
+# Read ALL hourly PM data to data frame from 2014-2017
 #--------------------------------------------------------------#
-
 # 1) Input CSV file
 hourly.pm25.FRM.2014 <- read_EPA_csv("data/hourly_88101_2014.csv")
 hourly.pm25.FRM.2015 <- read_EPA_csv("data/hourly_88101_2015.csv")
@@ -46,30 +45,19 @@ hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$D
                                                        hourly.pm25.FRM.14_17$Time.Local), 
                                                  format = "%Y-%m-%d %H:%M")
 
+
+
 #--------------------------------------------------------------#
 # Hourly Data of Mountain View, CA region
 #--------------------------------------------------------------#
-mv.site.num_list <- c(5, 1001, 6)
-mv.site.county_name_list <- c("San Mateo", "Santa Clara")
-mv.site.state_name <- "California"
+mv.site_nums <- c(5, 1001, 6)
+mv.county_names <- c("San Mateo", "Santa Clara")
+mv.state_name <- "California"
 mv.poc <- 3
 mv.start_date <- "2014-01-01 00:00"
 mv.end_date <- "2017-12-31 23:00"
 
-mv.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% mv.site.num_list & 
-                     County.Name %in% mv.site.county_name_list &
-                     State.Name == mv.site.state_name &
-                     DateTime.Local >= mv.start_date &
-                     DateTime.Local <= mv.end_date &
-                     POC == mv.poc)
-
-# Set to local time zone
-mv.sites$DateTime.Local <- ymd_hms(mv.sites$DateTime.Local, tz = "America/Los_Angeles")
-
-# Parse Date.Local into month and year columns
-mv.sites <- mv.sites %>%
-  mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
-         Year.Local = year(Date.Local))
+mv.pm_data <- filter.pm.data(mv.site_nums, mv.county_names, mv.state_name, mv.poc, mv.start_date, mv.end_date)
 
 # Graph
 mv.plot.linechart.pm25 <- scatter.plot.pm25(mv.sites)
@@ -84,37 +72,9 @@ geometric_mean <- function(values) {
 # Calculate hourly average by month and by year
 ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, mv.sites, geometric_mean)
 
+# Creates plot of hourly average by month and by year
 plot.ag(ag, "2015", c("January", "July", "December"))
 
-# # Graph aggregated hourly mean data by month in a year
-# ag %>%
-#   subset(Year.Local == "2014"
-#          & Month.Local %in% c("June", "July", "January")) %>%
-#   ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, color = as.character(Month.Local))) +
-#   geom_point() +
-#   geom_smooth(aes(group = as.character(Month.Local)), se = FALSE) +
-#   theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Filtering by hour (Could also filter by date)
-tempdf <- NULL
-tempdf <- subset(mv.sites,
-                 Time.Local == "00:00" &
-                   Date.Local >= "2015-01-01" &
-                   Date.Local <= "2015-01-31")
-
-# Arithmetic Mean
-tempdf %>%
-  summarise_at(vars(Sample.Measurement), funs(mean)) %>% round(3)
-
-# Geometric Mean
-tempdf %>%
-  summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
-
-# Plot histogram
-ggplot(tempdf, aes(x = Sample.Measurement)) +
-  geom_histogram() +
-  ggtitle(paste0(head(mv.sites$Date.Local, n = 1), " to ",
-                 tail(mv.sites$Date.Local, n = 1)))
 
 
 #--------------------------------------------------------------#
@@ -197,3 +157,33 @@ unique(select(subset(hourly.pm25.FRM.14_17, State.Name == "New York"), POC))
 #--------------------------------------------------------------#
 # Comment here
 #--------------------------------------------------------------#
+
+# # Graph aggregated hourly mean data by month in a year
+# ag %>%
+#   subset(Year.Local == "2014"
+#          & Month.Local %in% c("June", "July", "January")) %>%
+#   ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, color = as.character(Month.Local))) +
+#   geom_point() +
+#   geom_smooth(aes(group = as.character(Month.Local)), se = FALSE) +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# # Filtering by hour (Could also filter by date)
+# tempdf <- NULL
+# tempdf <- subset(mv.sites,
+#                  Time.Local == "00:00" &
+#                    Date.Local >= "2015-01-01" &
+#                    Date.Local <= "2015-01-31")
+# 
+# # Arithmetic Mean
+# tempdf %>%
+#   summarise_at(vars(Sample.Measurement), funs(mean)) %>% round(3)
+# 
+# # Geometric Mean
+# tempdf %>%
+#   summarise_at(vars(Sample.Measurement), funs(geometric_mean)) %>% round(3)
+# 
+# # Plot histogram
+# ggplot(tempdf, aes(x = Sample.Measurement)) +
+#   geom_histogram() +
+#   ggtitle(paste0(head(mv.sites$Date.Local, n = 1), " to ",
+#                  tail(mv.sites$Date.Local, n = 1)))
