@@ -56,7 +56,7 @@ load_all_csv.pm_data <- function() {
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm.data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone) {
+filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone) {
   filtered_data <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
                        County.Name %in% county_names &
                        State.Name == state_name &
@@ -78,9 +78,9 @@ filter.pm.data <- function(site_nums, county_names, state_name, poc, start_date,
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_sites.reno <- function(start, end, poc) {
+filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
   # Specify observed site numbers
-  reno.site_nums <- c(16, 22, 1005, 1007)
+  reno.site_nums <- c(16)
   
   # Specify observed county names
   reno.county_names <- c("Washoe")
@@ -89,21 +89,19 @@ filter.pm_sites.reno <- function(start, end, poc) {
   reno.state_name <- "Nevada"
   
   # Specify observed POC
-  reno.poc <- poc
+  reno.poc <- 3
   
   # Specify observed start date/time
-  # Set to very beginning
   reno.start_date <- start
   
   # Specify observed start date/time
-  # Set to very end
   reno.end_date <- end
   
   # Set observed timezone
   reno.timezone <- "America/Los_Angeles"
   
   # Filter data
-  return(filter.pm.data(reno.site_nums, 
+  return(filter.pm_data(reno.site_nums, 
                         reno.county_names, 
                         reno.state_name, reno.poc, 
                         reno.start_date, 
@@ -117,7 +115,7 @@ filter.pm_sites.reno <- function(start, end, poc) {
 #   for pm2.5
 # @param:
 #--------------------------------------------------------------#
-plot.pm <- function(data) {
+plot.all.pm <- function(data) {
   data %>%
     ggplot(aes(x = DateTime.Local, 
                y = Sample.Measurement, 
@@ -126,7 +124,6 @@ plot.pm <- function(data) {
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Time", y = "Micrograms/cubic meter", color = "Sites") +
-    # scale_x_date(breaks = date_breaks("6 months"), labels = date_format("%b %y")) +
     ggtitle(paste0(data$State.Name, " [", 
                    head(data$DateTime.Local, n = 1), " to ", 
                    tail(data$DateTime.Local, n = 1), "] ", "POC: ", 
@@ -139,11 +136,15 @@ plot.pm <- function(data) {
 #   of a given year
 # @param:
 #--------------------------------------------------------------#
-plot.pm.hourly_mean <- function(data, year, months) {
-  data %>%
-    subset(Year.Local == year
+plot.hourly_mean.pm <- function(data, years, months) {
+  # TODO: Possibly aggregate by every three months eventually
+  ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, 
+                  pm_sites.reno, geometric.mean)
+  ag %>%
+    subset(Year.Local %in% years
            & Month.Local %in% months) %>%
-    ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, color = as.character(Month.Local))) +
+    ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, 
+               color = as.character(Month.Local))) +
     geom_point() +
     geom_smooth(aes(group = as.character(Month.Local)), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
