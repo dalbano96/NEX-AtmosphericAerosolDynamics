@@ -11,7 +11,7 @@
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm.data <- function(site_nums, county_names, state_name, poc, start_date, end_date) {
+filter.pm.data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone) {
   filtered_data <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
                        County.Name %in% county_names &
                        State.Name == state_name &
@@ -20,13 +20,50 @@ filter.pm.data <- function(site_nums, county_names, state_name, poc, start_date,
                        POC == poc)
   
   # Set to local time zone
-  filtered_data$DateTime.Local <- ymd_hms(filtered_data$DateTime.Local, tz = "America/Los_Angeles")
+  filtered_data$DateTime.Local <- ymd_hms(filtered_data$DateTime.Local, tz = timezone)
   
   # Parse Date.Local into month and year columns
   filtered_data <- filtered_data %>%
     mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
            Year.Local = year(Date.Local))
   return(filtered_data)
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.reno <- function(start, end, poc) {
+  # Specify observed site numbers
+  reno.site_nums <- c(16, 22, 1005, 1007)
+  
+  # Specify observed county names
+  reno.county_names <- c("Washoe")
+  
+  # Specify observed State name
+  reno.state_name <- "Nevada"
+  
+  # Specify observed POC
+  reno.poc <- poc
+  
+  # Specify observed start date/time
+  # Set to very beginning
+  reno.start_date <- start
+  
+  # Specify observed start date/time
+  # Set to very end
+  reno.end_date <- end
+  
+  # Set observed timezone
+  reno.timezone <- "America/Los_Angeles"
+  
+  # Filter data
+  return(filter.pm.data(reno.site_nums, 
+                        reno.county_names, 
+                        reno.state_name, mv.poc, 
+                        reno.start_date, 
+                        reno.end_date,
+                        reno.timezone))
 }
 
 #--------------------------------------------------------------#

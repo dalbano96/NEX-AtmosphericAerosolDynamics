@@ -45,70 +45,13 @@ hourly.pm25.FRM.14_17$DateTime.Local <- as.POSIXct(paste(hourly.pm25.FRM.14_17$D
                                                        hourly.pm25.FRM.14_17$Time.Local), 
                                                  format = "%Y-%m-%d %H:%M")
 
-
-
-#--------------------------------------------------------------#
-# Hourly Data of Mountain View, CA region
-#--------------------------------------------------------------#
-find.pm_data.mv <- function() {
-  # Specify observed site numbers
-  mv.site_nums <- c(5, 1001, 6)
-  
-  # Specify observed county names
-  mv.county_names <- c("San Mateo", "Santa Clara")
-  
-  # Specify observed State name
-  mv.state_name <- "California"
-  
-  # Specify observed POC
-  mv.poc <- 3
-  
-  # Specify observed start date/time
-  mv.start_date <- "2014-01-01 00:00"
-  
-  # Specify observed start date/time
-  mv.end_date <- "2017-12-31 23:00"
-  
-  # Filter data
-  return(filter.pm.data(mv.site_nums, 
-                 mv.county_names, 
-                 mv.state_name, mv.poc, 
-                 mv.start_date, 
-                 mv.end_date))
-}
-
-pm_data.mv <- find.pm_data.mv()
-
-# Calculate hourly average by month and by year
-mv.ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, pm_data.mv, geometric.mean)
-
-# Creates plot of hourly average by month and by year
-plot.pm.hourly_mean(mv.ag, "2015", c("January", "July", "December"))
-
-
-
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
 #--------------------------------------------------------------#
-# Site 22 missing from year > 2015
-reno.site.num_list <- c(16, 22, 1005, 1007)
-reno.site.county_name_list <- c("Washoe")
-reno.site.state_name <- "Nevada"
-reno.poc <- min(unique(reno.sites$POC))
-
-reno.sites$DateTime.Local <- ymd_hms(reno.sites$DateTime.Local, tz = "America/Los_Angeles")
-reno.start_date <- "2014-01-01"
-reno.end_date <- "2017-12-31"
-
-reno.sites <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% reno.site.num_list & 
-                       County.Name %in% reno.site.county_name_list &
-                       State.Name == reno.site.state_name &
-                       POC == reno.poc &
-                       DateTime.Local >= reno.start_date &
-                       DateTime.Local <= reno.end_date)
-
-reno.plot.linechart.pm25 <- scatter.plot.pm25(reno.sites,reno.start_date, reno.end_date)
-reno.plot.linechart.pm25
+pm_sites.reno <- filter.pm_sites.reno("2014-01-01 00:00",
+                                      "2017-12-31 23:00",
+                                      1)
+plot.pm(pm_sites.reno)
 
 #--------------------------------------------------------------#
 # # Hourly Data of New York City region

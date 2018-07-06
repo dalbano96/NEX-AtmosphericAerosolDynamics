@@ -119,6 +119,8 @@ get.POC <- function(site_num, county_name) {
          c(POC)))
 }
 
+
+# Code below could be used to find common POC
 # Mountain View, CA
 get.POC(1001, "San Mateo")
 get.POC(5, "Santa Clara")
