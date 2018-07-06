@@ -84,15 +84,16 @@ geometric_mean <- function(values) {
 # Calculate hourly average by month and by year
 ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, mv.sites, geometric_mean)
 
-# Graph aggregated hourly mean data by month in a year
-ag %>%
-  subset(Year.Local == "2014"
-         & Month.Local >= "June"
-         & Month.Local <= "October") %>%
-  ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, color = as.character(Month.Local))) +
-  geom_point() +
-  geom_smooth(aes(group = as.character(Month.Local)), se = FALSE) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+plot.ag(ag, "2015", c("January", "July", "December"))
+
+# # Graph aggregated hourly mean data by month in a year
+# ag %>%
+#   subset(Year.Local == "2014"
+#          & Month.Local %in% c("June", "July", "January")) %>%
+#   ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, color = as.character(Month.Local))) +
+#   geom_point() +
+#   geom_smooth(aes(group = as.character(Month.Local)), se = FALSE) +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Filtering by hour (Could also filter by date)
 tempdf <- NULL

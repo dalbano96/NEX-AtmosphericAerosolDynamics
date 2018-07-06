@@ -29,6 +29,22 @@ scatter.plot.pm25 <- function(data) {
 }
 
 #--------------------------------------------------------------#
+# @desc: Plots hourly averages for a monthly period
+#   within a year
+# @param:
+#--------------------------------------------------------------#
+plot.ag <- function(data, year, months) {
+  data %>%
+    subset(Year.Local == year
+           & Month.Local %in% months) %>%
+    ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, color = as.character(Month.Local))) +
+    geom_point() +
+    geom_smooth(aes(group = as.character(Month.Local)), se = FALSE) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+}
+
+
+#--------------------------------------------------------------#
 # WORK IN PROGRESS
 #--------------------------------------------------------------#
 plot.linechart.AOD <- function(data, start.time, end.time) {
