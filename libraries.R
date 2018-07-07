@@ -18,3 +18,18 @@ library(sp)
 library(lubridate)
 library(reshape2)
 library(gridExtra)
+
+years <- c("2014", "2015", "2016", "2017")
+
+months <- c("January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December")

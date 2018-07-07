@@ -23,4 +23,4 @@ plot.all.pm(pm_sites.reno)
 
 # Plots aggregated hourly data for Reno
 # Able to specify which year(s) and month(s) to observe
-plot.hourly_mean.pm(pm_sites.reno, c(2014, 2015, 2016, 2017), c("November", "April"))
+plot.hourly_mean.pm(pm_sites.reno, c(years), c(months))

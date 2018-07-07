@@ -144,8 +144,10 @@ plot.hourly_mean.pm <- function(data, years, months) {
     subset(Year.Local %in% years
            & Month.Local %in% months) %>%
     ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, 
-               color = as.character(Month.Local))) +
+               color = Month.Local)) +
     geom_point() +
-    geom_smooth(aes(group = as.character(Month.Local)), se = FALSE) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    geom_smooth(aes(group = Month.Local), se = FALSE) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    labs(x = "Hour", y = "PM Concentration (Micrograms/cubic meter)", color = ("Month")) +
+    ggtitle("Aggregated Hourly Data", subtitle = paste0(unique(ag$Year.Local), collapse = ", "))
 }
