@@ -56,7 +56,7 @@ load_all_csv.pm_data <- function() {
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone) {
+filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone = "America/Los_Angeles") {
   filtered_data <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
                        County.Name %in% county_names &
                        State.Name == state_name &
@@ -64,7 +64,7 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
                        DateTime.Local <= end_date &
                        POC == poc)
   
-  # Set to local time zone
+  # Format to correct local time zone
   filtered_data$DateTime.Local <- ymd_hms(filtered_data$DateTime.Local, tz = timezone)
   
   # Parse Date.Local into month and year columns
@@ -180,7 +180,6 @@ plot.hourly_mean.pm <- function(data, years, months) {
            & Month.Local %in% months) %>%
     ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, 
                color = Month.Local)) +
-    geom_point() +
     geom_smooth(aes(group = Month.Local), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM Concentration (Micrograms/cubic meter)", color = ("Month")) +
