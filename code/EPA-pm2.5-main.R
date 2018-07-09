@@ -32,3 +32,4 @@ plot.hourly_mean.pm(pm_sites.reno, years.all, c("January", "July"))
 #--------------------------------------------------------------#
 pm_sites.balt <- filter.pm_sites.balt()
 plot.all.pm(pm_sites.balt)
+plot.hourly_mean.pm(pm_sites.balt, years, months)
