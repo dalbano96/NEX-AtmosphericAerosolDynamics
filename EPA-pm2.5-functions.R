@@ -81,7 +81,7 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
 filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
   # Specify observed site numbers
   reno.site_nums <- c(16)
-  
+
   # Specify observed county names
   reno.county_names <- c("Washoe")
   
@@ -90,7 +90,7 @@ filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
   
   # Specify observed POC
   reno.poc <- 3
-  
+
   # Specify observed start date/time
   reno.start_date <- start
   
@@ -107,6 +107,41 @@ filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
                         reno.start_date, 
                         reno.end_date,
                         reno.timezone))
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.balt <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+  # Specify observed site numbers
+  balt.site_nums <- c(40)
+  
+  # Specify observed county names
+  balt.county_names <- c("Baltimore (City)")
+  
+  # Specify observed State name
+  balt.state_name <- "Maryland"
+  
+  # Specify observed POC
+  balt.poc <- 3
+  
+  # Specify observed start date/time
+  balt.start_date <- start
+  
+  # Specify observed start date/time
+  balt.end_date <- end
+  
+  # Set observed timezone
+  balt.timezone <- "America/New_York"
+  
+  # Filter data
+  return(filter.pm_data(balt.site_nums, 
+                        balt.county_names, 
+                        balt.state_name, balt.poc, 
+                        balt.start_date, 
+                        balt.end_date,
+                        balt.timezone))
 }
 
 #--------------------------------------------------------------#
@@ -139,7 +174,7 @@ plot.all.pm <- function(data) {
 plot.hourly_mean.pm <- function(data, years, months) {
   # TODO: Possibly aggregate by every three months eventually
   ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, 
-                  pm_sites.reno, geometric.mean)
+                  data, geometric.mean)
   ag %>%
     subset(Year.Local %in% years
            & Month.Local %in% months) %>%
@@ -149,5 +184,5 @@ plot.hourly_mean.pm <- function(data, years, months) {
     geom_smooth(aes(group = Month.Local), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM Concentration (Micrograms/cubic meter)", color = ("Month")) +
-    ggtitle("Aggregated Hourly Data", subtitle = paste0(unique(ag$Year.Local), collapse = ", "))
+    ggtitle("Aggregated Hourly Data", subtitle = paste0(unique(years), collapse = ", "))
 }

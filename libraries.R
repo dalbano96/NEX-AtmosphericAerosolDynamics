@@ -19,9 +19,9 @@ library(lubridate)
 library(reshape2)
 library(gridExtra)
 
-years <- c("2014", "2015", "2016", "2017")
+years.all <- c("2014", "2015", "2016", "2017")
 
-months <- c("January",
+months.all <- c("January",
             "February",
             "March",
             "April",

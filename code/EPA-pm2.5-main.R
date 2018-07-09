@@ -23,4 +23,12 @@ plot.all.pm(pm_sites.reno)
 
 # Plots aggregated hourly data for Reno
 # Able to specify which year(s) and month(s) to observe
-plot.hourly_mean.pm(pm_sites.reno, c(years), c(months))
+plot.hourly_mean.pm(pm_sites.reno, years.all, months.all)
+
+plot.hourly_mean.pm(pm_sites.reno, years.all, c("January", "July"))
+
+#--------------------------------------------------------------#
+# Hourly PM2.5 Data of Baltimore, MD
+#--------------------------------------------------------------#
+pm_sites.balt <- filter.pm_sites.balt()
+plot.all.pm(pm_sites.balt)
