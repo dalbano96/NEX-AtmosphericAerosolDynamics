@@ -178,7 +178,7 @@ plot.hourly_mean.pm <- function(data, years, months) {
   ag %>%
     subset(Year.Local %in% years
            & Month.Local %in% months) %>%
-    ggplot(aes(x = Time.Local, y = Sample.Measurement, ymax = 15, 
+    ggplot(aes(x = Time.Local, y = Sample.Measurement, 
                color = Month.Local)) +
     geom_smooth(aes(group = Month.Local), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
