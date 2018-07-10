@@ -19,9 +19,6 @@ library(lubridate)
 library(reshape2)
 library(gridExtra)
 
-library(MonetDBLite)
-library(DBI)
-
 years.all <- c("2014", "2015", "2016", "2017")
 
 months.all <- c("January",
