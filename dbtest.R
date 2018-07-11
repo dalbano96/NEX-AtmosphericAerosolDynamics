@@ -9,6 +9,8 @@ library(dplyr)
 # https://aeronet.gsfc.nasa.gov/cgi-bin/combined_data_access_v3
 # after downloading file should have the following name (your path will differ)
 aeronet.file <- file.path("/Users/darylalbano/Downloads/All_Sites_Times_All_Points_AOD20.dat")
+# aeronet.file <- file.path("/Users/darylalbano/NEX-AtmosphericAerosolDynamics/data/20140101_20171231_Univ_of_Nevada-Reno/20140101_20171231_Univ_of_Nevada-Reno.lev20")
+# aeronet.file <- file.path("/Users/darylalbano/NEX-AtmosphericAerosolDynamics/data/20140101_20171231_NASA_Ames/20140101_20171231_NASA_Ames.lev20")
 
 # folder where monetdb can put the database (absolute path)
 dbdir <- file.path( "/Users/darylalbano/Downloads" , 'rudis' )
@@ -25,6 +27,8 @@ top <- readLines(aeronet.file, n = 8)
 # we see it is comma delimited
 # and we see the headers are really on line 7
 top
+
+mdb <- dbConnect(MonetDBLite(), dbdir)
 
 # now we guess the column types by reading in a small fraction of the rows
 # important to skip the first 6 rows as we decided above
@@ -46,7 +50,6 @@ table(apply(guess[, aodnames], 1, function(x) sum(x != -999)))
 # make a connection and get rid of the old table if it exists since
 # we are just playing around. in real life you prbly want to keep
 # the giant table there vs recreate it every time
-mdb <- dbConnect(MonetDBLite(), dbdir)
 try(invisible(dbSendQuery(mdb, "DROP TABLE allaeronet")), silent=TRUE)
 
 # we build the table creation dynamically from what we've learned from guessing
@@ -71,7 +74,9 @@ glimpse(mdb_aeronet)
 # next steps would be to filter down to the subset of data we want and work with it
 
 # shut it down when done
-dbDisconnect(mdb, shutdown=TRUE)
+dbDisconnect(mdb, shutdown = TRUE)
 
 # if the dbdir was a non-temporary location then the data remain there
 utils:::format.object_size(sum(file.info(list.files(dbdir, all.files = TRUE, full.names = TRUE, recursive = TRUE))$size), "auto")
+
+

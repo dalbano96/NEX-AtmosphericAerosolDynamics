@@ -34,3 +34,14 @@ pm_sites.balt <- filter.pm_sites.balt()
 plot.all.pm(pm_sites.balt)
 plot.hourly_mean.pm(pm_sites.balt, years.all, months.all[5:8])
 
+
+
+
+# Testing correlation coefficient
+pm_aeronet <- function() {
+  ag_pm <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, 
+                  pm_sites.reno, geometric.mean)
+  ag_aeronet <- aggregate(X440.870_Angstrom_Exponent)
+  
+}
+

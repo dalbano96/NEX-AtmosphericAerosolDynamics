@@ -8,7 +8,7 @@
 #--------------------------------------------------------------#
 
 #--------------------------------------------------------------#
-# Read AOD csv to data frame
+# Read AOD csv to data frame (These will be loaded onto db)
 #--------------------------------------------------------------#
 # 1) Importing AOD datasets
 hourly.AOD.AMES.14_17 <- NULL
@@ -84,11 +84,15 @@ hourly.AOD.Reno.14_17 <- rename(hourly.AOD.Reno.14_17, Date.GMT = Date.dd.mm.yyy
 hourly.AOD.Reno.14_17 <- rename(hourly.AOD.Reno.14_17, Time.GMT = Time.hh.mm.ss.)
 
 # 4) Joining date and time into a new column "DateTime.GMT"
-hourly.AOD.Reno.14_17$DateTime.GMT <- as.POSIXct(paste(hourly.AOD.Reno.14_17$Date.GMT,
+hourly.AOD.Reno.14_17$DateTime.GMT <- ymd_hms(as.POSIXct(paste(hourly.AOD.Reno.14_17$Date.GMT,
                                                        hourly.AOD.Reno.14_17$Time.GMT),
-                                                 format = "%Y-%m-%d %H:%M:%S")
+                                                 format = "%Y-%m-%d %H:%M:%S"), tz = "GMT")
+
 # Converting to local (PDT) time zone
-hourly.AOD.Reno.14_17$DateTime.Local <- with_tz(hourly.AOD.Reno.14_17$DateTime.GMT, tz = "America/Los_Angeles")
+hourly.AOD.Reno.14_17$DateTime.Local <- with_tz(hourly.AOD.Reno.14_17$DateTime.GMT, tzone = "America/Los_Angeles")
+
+head(hourly.AOD.Reno.14_17$DateTime.GMT, n = 5)
+head(hourly.AOD.Reno.14_17$DateTime.Local, n = 5)
 
 # 5) Setting all -999 to NA TODO: There has to be a better way to format this.
 hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
