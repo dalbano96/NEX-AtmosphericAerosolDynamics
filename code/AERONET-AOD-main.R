@@ -88,8 +88,16 @@ hourly.AOD.Reno.14_17$DateTime.GMT <- ymd_hms(as.POSIXct(paste(hourly.AOD.Reno.1
                                                        hourly.AOD.Reno.14_17$Time.GMT),
                                                  format = "%Y-%m-%d %H:%M:%S"), tz = "GMT")
 
+# After joining date and time columns, the date and time column are rounded to nearest hour
+hourly.AOD.Reno.14_17$DateTime.GMT <- round_date(hourly.AOD.Reno.14_17$DateTime.GMT, unit = "hour")
+
 # Converting to local (PDT) time zone
 hourly.AOD.Reno.14_17$DateTime.Local <- with_tz(hourly.AOD.Reno.14_17$DateTime.GMT, tzone = "America/Los_Angeles")
+  
+# (WIP)
+# hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
+#   mutate(Date.Local = date(DateTime.Local, label = TRUE, abbr = FALSE),
+#          )
 
 head(hourly.AOD.Reno.14_17$DateTime.GMT, n = 5)
 head(hourly.AOD.Reno.14_17$DateTime.Local, n = 5)
@@ -105,6 +113,12 @@ hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
   mutate(AOD_380nm = replace(AOD_380nm, AOD_380nm == -999, NA)) %>%
   mutate(AOD_340nm = replace(AOD_340nm, AOD_340nm == -999, NA)) %>%
   mutate(X440.870_Angstrom_Exponent = replace(X440.870_Angstrom_Exponent, X440.870_Angstrom_Exponent == -999, NA))
+
+# 6) Separating Month and Year (WIP)
+hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
+  mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
+         Year.Local = year(Date.Local))
+
 
 # Graph!
 start.date <- "2014-01-01 00:00"
