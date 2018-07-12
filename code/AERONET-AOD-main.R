@@ -93,14 +93,10 @@ hourly.AOD.Reno.14_17$DateTime.GMT <- round_date(hourly.AOD.Reno.14_17$DateTime.
 
 # Converting to local (PDT) time zone
 hourly.AOD.Reno.14_17$DateTime.Local <- with_tz(hourly.AOD.Reno.14_17$DateTime.GMT, tzone = "America/Los_Angeles")
-  
-# (WIP)
-# hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
-#   mutate(Date.Local = date(DateTime.Local, label = TRUE, abbr = FALSE),
-#          )
 
-head(hourly.AOD.Reno.14_17$DateTime.GMT, n = 5)
-head(hourly.AOD.Reno.14_17$DateTime.Local, n = 5)
+# Checking conversion
+head(hourly.AOD.Reno.14_17$DateTime.GMT, n = 20)
+head(hourly.AOD.Reno.14_17$DateTime.Local, n = 20)
 
 # 5) Setting all -999 to NA TODO: There has to be a better way to format this.
 hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
@@ -116,13 +112,13 @@ hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
 
 # 6) Separating Month and Year (WIP)
 hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
-  mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
-         Year.Local = year(Date.Local))
+  mutate(Month.Local = month(DateTime.Local, label = TRUE, abbr = FALSE),
+         Year.Local = year(DateTime.Local))
 
 
 # Graph!
-start.date <- "2014-01-01 00:00"
-end.date <- "2017-12-31 23:59"
+start.date <- "2014-06-01 00:00"
+end.date <- "2014-06-30 23:59"
 
 hourly.AOD.Reno.14_17 %>%
   na.omit() %>%

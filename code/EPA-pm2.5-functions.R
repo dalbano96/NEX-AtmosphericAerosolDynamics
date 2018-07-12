@@ -171,7 +171,7 @@ plot.all.pm <- function(data) {
 #   of a given year
 # @param:
 #--------------------------------------------------------------#
-plot.hourly_mean.pm <- function(data, years, months) {
+plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
   # TODO: Possibly aggregate by every three months eventually
   ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, 
                   data, geometric.mean)
@@ -182,19 +182,19 @@ plot.hourly_mean.pm <- function(data, years, months) {
                color = Month.Local)) +
     geom_smooth(aes(group = Month.Local), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(x = "Hour", y = "PM Concentration (Micrograms/cubic meter)", color = ("Month")) +
-    ggtitle("Aggregated Hourly Data", subtitle = paste0(unique(years), collapse = ", "))
+    labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
+    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
 }
 
 
 
 # Testing db integration
-dbdir <- file.path("data/", 'NEX-AAS-db.db')
-con <- dbConnect(SQLite(), dbdir)
-
-dbListTables(con)
-src_sqlite(embedded = "data/NEX-AAS-db.db")
-sqlite_pm <- tbl(src_sqlite, "hourly_88101_2015")
-dbListFields(con, "hourly_88101_2015")
-
-dbDisconnect(con, shutdown = TRUE)
+# dbdir <- file.path("data/", 'NEX-AAS-db.db')
+# con <- dbConnect(SQLite(), dbdir)
+# 
+# dbListTables(con)
+# src_sqlite(embedded = "data/NEX-AAS-db.db")
+# sqlite_pm <- tbl(src_sqlite, "hourly_88101_2015")
+# dbListFields(con, "hourly_88101_2015")
+# 
+# dbDisconnect(con, shutdown = TRUE)
