@@ -173,12 +173,14 @@ plot.all.pm <- function(data) {
 #--------------------------------------------------------------#
 plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
   # TODO: Possibly aggregate by every three months eventually
-  ag <- aggregate(Sample.Measurement ~ Time.Local, data, geometric.mean)
+  ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, 
+                  data, geometric.mean)
   ag %>%
+    subset(Year.Local %in% years
+           & Month.Local %in% months) %>%
     ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
-    geom_line(group = 1) +
-    # geom_smooth(aes(group = Month.Local), se = FALSE) +
-    # geom_point(hourly.AOD.Reno.14_17, aes(x = ))
+    geom_point() +
+    geom_smooth(aes(group = 1), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
     ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
