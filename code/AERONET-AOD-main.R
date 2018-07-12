@@ -110,7 +110,7 @@ hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
   mutate(AOD_340nm = replace(AOD_340nm, AOD_340nm == -999, NA)) %>%
   mutate(X440.870_Angstrom_Exponent = replace(X440.870_Angstrom_Exponent, X440.870_Angstrom_Exponent == -999, NA))
 
-# 6) Separating Month and Year (WIP)
+# 6) Separating Month and Year
 hourly.AOD.Reno.14_17 <- hourly.AOD.Reno.14_17 %>%
   mutate(Month.Local = month(DateTime.Local, label = TRUE, abbr = FALSE),
          Year.Local = year(DateTime.Local))
