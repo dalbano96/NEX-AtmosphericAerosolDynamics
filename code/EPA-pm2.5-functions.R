@@ -151,6 +151,41 @@ filter.pm_sites.balt <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
 }
 
 #--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.denv <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+  # Specify observed site numbers
+  denv.site_nums <- c(26, 28, 2)
+  
+  # Specify observed county names
+  denv.county_names <- c("Denver")
+  
+  # Specify observed State name
+  denv.state_name <- "Colorado"
+  
+  # Specify observed POC
+  denv.poc <- 3
+  
+  # Specify observed start date/time
+  denv.start_date <- start
+  
+  # Specify observed start date/time
+  denv.end_date <- end
+  
+  # Set observed timezone
+  denv.timezone <- "America/Denver"
+  
+  # Filter data
+  return(filter.pm_data(denv.site_nums, 
+                        denv.county_names, 
+                        denv.state_name, denv.poc, 
+                        denv.start_date, 
+                        denv.end_date,
+                        denv.timezone))
+}
+
+#--------------------------------------------------------------#
 # TODO: allow it to plot from multiple sites
 # @desc: Plots PM data for a given time range
 #   for pm2.5
@@ -188,7 +223,7 @@ plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
     #            color = Month.Local)) +
     ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
     geom_point() +
-    facet_grid(Month.Local ~ Year.Local) +
+    facet_grid(Year.Local ~ Month.Local) +
     # facet_wrap(~ Month.Local) +
     geom_smooth(aes(group = Month.Local), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
@@ -197,13 +232,6 @@ plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
     ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
 }
 
-# Testing cyclic cubic splines
-# ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, pm_sites.reno, geometric.mean)
-mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
-            data = pm_sites.reno)
-layout(matrix(1:2, ncol = 2))
-plot(mod$gam, scale = 0)
-layout(1)
 
 # 
 # acf(resid(mod$lme), lag.max = 36, main = "ACF")

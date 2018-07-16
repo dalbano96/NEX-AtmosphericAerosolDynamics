@@ -28,14 +28,31 @@ plot.hourly_mean.pm(pm_sites.reno, years.all[1])
 plot.hourly_mean.pm(pm_sites.reno, "2015")
 plot.hourly_mean.pm(pm_sites.reno, years.all, months.all[c(1,8)])
 
+# Plot cyclic cubic splines for Reno, NV
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
+            data = pm_sites.reno)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)
+
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Baltimore, MD
 #--------------------------------------------------------------#
 pm_sites.balt <- filter.pm_sites.balt()
 plot.all.pm(pm_sites.balt)
-plot.hourly_mean.pm(pm_sites.balt, years.all, months.all[5:8])
+plot.hourly_mean.pm(pm_sites.balt, years.all[1:2])
 
+# Plot cyclic cubic splines for Baltimore, MD
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
+            data = pm_sites.balt)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)
 
+#--------------------------------------------------------------#
+# Hourly PM2.5 Data of Denver, CO
+#--------------------------------------------------------------#
+pm_sites.denv <- filter.pm_sites.denv()
 
 
 # Testing correlation coefficient
