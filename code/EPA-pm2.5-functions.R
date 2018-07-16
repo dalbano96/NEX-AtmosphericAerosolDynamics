@@ -40,6 +40,7 @@ load_all_csv.pm_data <- function() {
   pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
   pm.df$Date.GMT <- as.Date(pm.df$Date.GMT, format = "%F")
   
+  
   # 4) Joining date and time into single column for GMT and local
   # GMT time zone set for DateTime.GMT
   pm.df$DateTime.GMT <- as.POSIXct(paste(pm.df$Date.GMT, 
@@ -49,6 +50,11 @@ load_all_csv.pm_data <- function() {
   pm.df$DateTime.Local <- as.POSIXct(paste(pm.df$Date.Local, 
                                            pm.df$Time.Local), 
                                      format = "%Y-%m-%d %H:%M")
+  
+  # 5) Convert Time columns to time objects (WIP)
+  pm.df$Time.Local <- hour(hms::parse_hm(pm.df$Time.Local))
+  pm.df$Time.GMT <- hour(hms::parse_hm(pm.df$Time.GMT))
+  
   return(pm.df)
 }
 
@@ -173,20 +179,36 @@ plot.all.pm <- function(data) {
 #--------------------------------------------------------------#
 plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
   # TODO: Possibly aggregate by every three months eventually
-  ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, 
+  ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local,
                   data, geometric.mean)
   ag %>%
     subset(Year.Local %in% years
            & Month.Local %in% months) %>%
+    # ggplot(aes(x = Time.Local, y = Sample.Measurement,
+    #            color = Month.Local)) +
     ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
     geom_point() +
-    geom_smooth(aes(group = 1), se = FALSE) +
+    facet_grid(Month.Local ~ Year.Local) +
+    # facet_wrap(~ Month.Local) +
+    geom_smooth(aes(group = Month.Local), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
+    scale_x_continuous(breaks = waiver()) +
     ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
 }
 
+# Testing cyclic cubic splines
+# ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local, pm_sites.reno, geometric.mean)
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
+            data = pm_sites.reno)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)
 
+# 
+# acf(resid(mod$lme), lag.max = 36, main = "ACF")
+# pacf(resid(mod$lme), lag.max = 36, main = "pACF")
+# layout(1)
 
 # Testing db integration
 # dbdir <- file.path("data/", 'NEX-AAS-db.db')

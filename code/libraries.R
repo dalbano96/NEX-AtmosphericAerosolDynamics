@@ -21,6 +21,7 @@ library(gridExtra)
 library(RSQLite)
 library(sqldf)
 library(psych)
+library(mgcv)
 
 years.all <- c("2014", "2015", "2016", "2017")
 
