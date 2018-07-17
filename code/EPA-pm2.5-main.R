@@ -8,7 +8,7 @@
 #--------------------------------------------------------------#
 
 # Load all data from csv files
-hourly.pm25.FRM.14_17 <- load_all_csv.pm_data()
+system.time(hourly.pm25.FRM.14_17 <- load_all_csv.pm_data())
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
@@ -41,6 +41,7 @@ layout(1)
 #--------------------------------------------------------------#
 pm_sites.balt <- filter.pm_sites.balt()
 plot.all.pm(pm_sites.balt)
+plot.hourly_mean.pm(pm_sites.balt)
 plot.hourly_mean.pm(pm_sites.balt, years.all[1:2])
 plot.hourly_mean.pm(pm_sites.balt, "2014")
 
@@ -57,6 +58,7 @@ layout(1)
 #--------------------------------------------------------------#
 pm_sites.denv <- filter.pm_sites.denv()
 plot.all.pm(pm_sites.denv)
+plot.hourly_mean.pm(pm_sites.denv)
 plot.hourly_mean.pm(pm_sites.denv, years.all, months.all[c(1, 6,12)])
 plot.hourly_mean.pm(pm_sites.denv, "2014")
 
@@ -73,7 +75,9 @@ layout(1)
 #--------------------------------------------------------------#
 pm_sites.ny <- filter.pm_sites.ny()
 plot.all.pm(pm_sites.ny)
-plot.hourly_mean.pm(pm_sites.ny, "2014")
+plot.all.pm(pm_sites.ny, "2015", months.all[1:4])
+plot.hourly_mean.pm(pm_sites.ny)
+plot.hourly_mean.pm(pm_sites.ny, "2016")
 
 mod <- NULL
 mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
@@ -82,6 +86,11 @@ layout(matrix(1:2, ncol = 2))
 plot(mod$gam, scale = 0)
 layout(1)
 
+
+# Binding all sites (WIP)
+filtered_pmsites <- bind_rows(pm_sites.reno, pm_sites.balt)
+filtered_pmsites <- bind_rows(filtered_pmsites, pm_sites.denv)
+filtered_pmsites <- bind_rows(filtered_pmsites, pm_sites.ny)
 
 # Testing correlation coefficient
 pm_aeronet <- function() {

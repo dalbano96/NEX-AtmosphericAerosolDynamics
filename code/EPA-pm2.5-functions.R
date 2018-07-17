@@ -228,16 +228,18 @@ filter.pm_sites.ny <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:
 #   for pm2.5
 # @param:
 #--------------------------------------------------------------#
-plot.all.pm <- function(data) {
+plot.all.pm <- function(data, years = years.all, months = months.all) {
   data %>%
+    subset(Year.Local %in% years
+           & Month.Local %in% months) %>%
     ggplot(aes(x = strptime(DateTime.Local, format = "%F %H:%M"), 
                y = Sample.Measurement, 
                group = Site.Num, color = as.character(Site.Num))) +
     geom_point(position = position_dodge(width = 0.75)) +
-    geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
+    geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, color = "black", aes(group = 1)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Time", y = "Micrograms/cubic meter", color = "Sites") +
-    scale_x_datetime(date_breaks = "6 months") +
+    # scale_x_datetime(date_breaks = "3 months") +
     ggtitle(paste0(data$State.Name, " [", 
                    head(data$DateTime.Local, n = 1), " to ", 
                    tail(data$DateTime.Local, n = 1), "] ", "POC: ", 
@@ -251,19 +253,39 @@ plot.all.pm <- function(data) {
 # @param:
 #--------------------------------------------------------------#
 plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
+  # # TODO: Possibly aggregate by every three months eventually
+  # ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local,
+  #                 data, geometric.mean)
+  # ag %>%
+  #   subset(Year.Local %in% years
+  #          & Month.Local %in% months) %>%
+  #   # ggplot(aes(x = Time.Local, y = Sample.Measurement,
+  #   #            color = Month.Local)) +
+  #   ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
+  #   geom_point() +
+  #   # facet_grid(Year.Local ~ Month.Local) +
+  #   facet_wrap(~ Month.Local) +
+  #   geom_smooth(method = "loess", aes(group = Month.Local), se = FALSE) +
+  #   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  #   labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
+  #   scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
+  #                      label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
+  #   ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
+  
+  
+  # Below is a "butchered" zombie set of code
   # TODO: Possibly aggregate by every three months eventually
-  ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local,
+  ag <- aggregate(Sample.Measurement ~ Time.Local,
                   data, geometric.mean)
   ag %>%
-    subset(Year.Local %in% years
-           & Month.Local %in% months) %>%
     # ggplot(aes(x = Time.Local, y = Sample.Measurement,
     #            color = Month.Local)) +
     ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
     geom_point() +
     # facet_grid(Year.Local ~ Month.Local) +
-    facet_wrap(~ Month.Local) +
-    geom_smooth(aes(group = Month.Local), se = FALSE) +
+    # facet_wrap(~ Month.Local) +
+    # geom_smooth(method = "loess", aes(group = Month.Local), se = FALSE) +
+    geom_smooth(method = "loess", aes(group = 1), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
