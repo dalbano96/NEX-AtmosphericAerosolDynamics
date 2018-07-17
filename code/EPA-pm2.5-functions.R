@@ -156,7 +156,8 @@ filter.pm_sites.balt <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
 #--------------------------------------------------------------#
 filter.pm_sites.denv <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
   # Specify observed site numbers
-  denv.site_nums <- c(26, 28, 2)
+  # denv.site_nums <- c(26, 28, 2)
+  denv.site_nums <- c(2)
   
   # Specify observed county names
   denv.county_names <- c("Denver")
@@ -186,6 +187,42 @@ filter.pm_sites.denv <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
 }
 
 #--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.ny <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+  # Specify observed site numbers
+  # ny.site_nums <- c(26, 28, 2)
+  ny.site_nums <- c(110)
+  
+  # Specify observed county names
+  ny.county_names <- c("Bronx")
+  
+  # Specify observed State name
+  ny.state_name <- "New York"
+  
+  # Specify observed POC
+  ny.poc <- 4
+  
+  # Specify observed start date/time
+  ny.start_date <- start
+  
+  # Specify observed start date/time
+  ny.end_date <- end
+  
+  # Set observed timezone
+  ny.timezone <- "America/New_York"
+  
+  # Filter data
+  return(filter.pm_data(ny.site_nums, 
+                        ny.county_names, 
+                        ny.state_name, ny.poc, 
+                        ny.start_date, 
+                        ny.end_date,
+                        ny.timezone))
+}
+
+#--------------------------------------------------------------#
 # TODO: allow it to plot from multiple sites
 # @desc: Plots PM data for a given time range
 #   for pm2.5
@@ -193,13 +230,14 @@ filter.pm_sites.denv <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
 #--------------------------------------------------------------#
 plot.all.pm <- function(data) {
   data %>%
-    ggplot(aes(x = DateTime.Local, 
+    ggplot(aes(x = strptime(DateTime.Local, format = "%F %H:%M"), 
                y = Sample.Measurement, 
                group = Site.Num, color = as.character(Site.Num))) +
     geom_point(position = position_dodge(width = 0.75)) +
     geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, aes(group = 1)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Time", y = "Micrograms/cubic meter", color = "Sites") +
+    scale_x_datetime(date_breaks = "6 months") +
     ggtitle(paste0(data$State.Name, " [", 
                    head(data$DateTime.Local, n = 1), " to ", 
                    tail(data$DateTime.Local, n = 1), "] ", "POC: ", 
@@ -223,12 +261,13 @@ plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
     #            color = Month.Local)) +
     ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
     geom_point() +
-    facet_grid(Year.Local ~ Month.Local) +
-    # facet_wrap(~ Month.Local) +
+    # facet_grid(Year.Local ~ Month.Local) +
+    facet_wrap(~ Month.Local) +
     geom_smooth(aes(group = Month.Local), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
-    scale_x_continuous(breaks = waiver()) +
+    scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
+                       label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
     ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
 }
 
