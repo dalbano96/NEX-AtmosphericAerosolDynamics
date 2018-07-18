@@ -20,13 +20,17 @@ pm_sites.reno <- filter.pm_sites.reno()
 
 # Plots all hourly PM data for Reno
 plot.all.pm(pm_sites.reno)
+ggsave("figures/Reno NV/Reno-allpts.png", dpi = 300)
 
 # Plots aggregated hourly data for Reno
 # Able to specify which year(s) and month(s) to observe
 plot.hourly_mean.pm(pm_sites.reno)
 plot.hourly_mean.pm(pm_sites.reno, years.all[1])
-plot.hourly_mean.pm(pm_sites.reno, "2015")
+plot.hourly_mean.pm(pm_sites.reno, "2016")
+ggsave("figures/Reno NV/Reno-12mo1yr.png", dpi = 300)
 plot.hourly_mean.pm(pm_sites.reno, years.all, months.all[c(1,8)])
+plot.hourly_mean.pm(pm_sites.reno, years.all, months.all[c(3,6,9,12)])
+ggsave("figures/Reno-3mo4yr-01.png", dpi = 300)
 
 # Plot cyclic cubic splines for Reno, NV
 mod <- NULL
@@ -78,6 +82,7 @@ plot.all.pm(pm_sites.ny)
 plot.all.pm(pm_sites.ny, "2015", months.all[1:4])
 plot.hourly_mean.pm(pm_sites.ny)
 plot.hourly_mean.pm(pm_sites.ny, "2016")
+plot.hourly_mean.pm(pm_sites.ny, years.all, months.all[4:8])
 
 mod <- NULL
 mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
@@ -88,6 +93,7 @@ layout(1)
 
 
 # Binding all sites (WIP)
+filtered_pmsites <- NULL
 filtered_pmsites <- bind_rows(pm_sites.reno, pm_sites.balt)
 filtered_pmsites <- bind_rows(filtered_pmsites, pm_sites.denv)
 filtered_pmsites <- bind_rows(filtered_pmsites, pm_sites.ny)
