@@ -18,6 +18,7 @@ load_all_csv.pm_data <- function() {
   read_EPA_csv <- function(filename) {
     df <- NULL
     df <- read.csv(filename, stringsAsFactors = FALSE)
+    # Removes negative values from Sample.Measurement
     df <- subset(df, Sample.Measurement > 0.00)
     return(df)
   }
@@ -40,9 +41,10 @@ load_all_csv.pm_data <- function() {
   pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
   pm.df$Date.GMT <- as.Date(pm.df$Date.GMT, format = "%F")
   
+  # Format to correct GMT time zone w/o changing the clock time
+  pm.df$Time.GMT <- force_tz(pm.df$Time.GMT, tz = "GMT")
   
   # 4) Joining date and time into single column for GMT and local
-  # GMT time zone set for DateTime.GMT
   pm.df$DateTime.GMT <- as.POSIXct(paste(pm.df$Date.GMT, 
                                          pm.df$Time.GMT), 
                                    format = "%Y-%m-%d %H:%M")
@@ -51,7 +53,7 @@ load_all_csv.pm_data <- function() {
                                            pm.df$Time.Local), 
                                      format = "%Y-%m-%d %H:%M")
   
-  # 5) Convert Time columns to time objects (WIP)
+  # 5) Convert Time columns to integer values b/w [0-23] (WIP)
   pm.df$Time.Local <- hour(hms::parse_hm(pm.df$Time.Local))
   pm.df$Time.GMT <- hour(hms::parse_hm(pm.df$Time.GMT))
   
@@ -59,8 +61,10 @@ load_all_csv.pm_data <- function() {
 }
 
 #--------------------------------------------------------------#
-# @desc:
-# @param:
+# @desc: Filters PM data frame based on specified location.
+# @param: PM SITE INFO ->Site number(s), county names(s),
+#   state name, start date (if specified by user), end date
+#   (if specified by user), timezone.
 #--------------------------------------------------------------#
 filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone = "America/Los_Angeles") {
   filtered_data <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
@@ -70,8 +74,8 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
                        DateTime.Local <= end_date &
                        POC == poc)
   
-  # Format to correct local time zone
-  filtered_data$DateTime.Local <- ymd_hms(filtered_data$DateTime.Local, tz = timezone)
+  # Format to correct local time zone w/o changing the clock time
+  filtered_data$DateTime.Local <- force_tz(filtered_data$DateTime.Local, tz = timezone)
   
   # Parse Date.Local into month and year columns
   filtered_data <- filtered_data %>%
