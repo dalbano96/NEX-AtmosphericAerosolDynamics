@@ -106,3 +106,21 @@ pm_aeronet <- function() {
   
 }
 
+#--------------------------------------------------------------#
+# Hourly PM2.5 Data of Los Angeles, CA
+#--------------------------------------------------------------#
+pm_sites.LosAng <- filter.pm_sites.LosAng()
+plot.all.pm(pm_sites.LosAng)
+pm_sites.LosAng %>%
+  plot.hourly_mean.pm("2016")
+
+mod <- NULL
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
+            data = pm_sites.LosAng)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)
+
+mod <- gamm(Sample.Measurement ~ s(Time.Local, bs = "cc", k = 24),
+            data = pm_sites.LosAng)
+plot(mod$gam, scale = 0)

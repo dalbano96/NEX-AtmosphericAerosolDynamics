@@ -18,7 +18,7 @@ load_all_csv.pm_data <- function() {
   read_EPA_csv <- function(filename) {
     df <- NULL
     df <- read.csv(filename, stringsAsFactors = FALSE)
-    # Removes negative values from Sample.Measurement
+    # Removes NULL and negative values from Sample.Measurement
     df <- subset(df, Sample.Measurement > 0.00)
     return(df)
   }
@@ -37,23 +37,22 @@ load_all_csv.pm_data <- function() {
   pm.df <- bind_rows(pm.df, pm.2016)
   pm.df <- bind_rows(pm.df, pm.2017)
   
-  # 3) Convert Date columns to date objects
+  # 3) Convert Date columns from character to date objects
   pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
   pm.df$Date.GMT <- as.Date(pm.df$Date.GMT, format = "%F")
   
-  # Format to correct GMT time zone w/o changing the clock time
-  pm.df$Time.GMT <- force_tz(pm.df$Time.GMT, tz = "GMT")
-  
   # 4) Joining date and time into single column for GMT and local
-  pm.df$DateTime.GMT <- as.POSIXct(paste(pm.df$Date.GMT, 
+  # GMT date/time
+  pm.df$DateTime.GMT <- force_tz(as.POSIXct(paste(pm.df$Date.GMT, 
                                          pm.df$Time.GMT), 
-                                   format = "%Y-%m-%d %H:%M")
+                                   format = "%Y-%m-%d %H:%M"), tz = "GMT")
   
+  # Local date/time (will be properly localized when filtering by site)
   pm.df$DateTime.Local <- as.POSIXct(paste(pm.df$Date.Local, 
                                            pm.df$Time.Local), 
                                      format = "%Y-%m-%d %H:%M")
   
-  # 5) Convert Time columns to integer values b/w [0-23] (WIP)
+  # 5) Convert Time columns to integer values b/w [0-23]
   pm.df$Time.Local <- hour(hms::parse_hm(pm.df$Time.Local))
   pm.df$Time.GMT <- hour(hms::parse_hm(pm.df$Time.GMT))
   
@@ -224,6 +223,41 @@ filter.pm_sites.ny <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:
                         ny.start_date, 
                         ny.end_date,
                         ny.timezone))
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.LosAng <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+  # Specify observed site numbers
+  LosAng.site_nums <- c(4008)
+  
+  # Specify observed county names
+  LosAng.county_names <- c("Los Angeles")
+  
+  # Specify observed State name
+  LosAng.state_name <- "California"
+  
+  # Specify observed POC
+  LosAng.poc <- 3
+  
+  # Specify observed start date/time
+  LosAng.start_date <- start
+  
+  # Specify observed start date/time
+  LosAng.end_date <- end
+  
+  # Set observed timezone
+  LosAng.timezone <- "America/Los_Angeles"
+  
+  # Filter data
+  return(filter.pm_data(LosAng.site_nums, 
+                        LosAng.county_names, 
+                        LosAng.state_name, LosAng.poc, 
+                        LosAng.start_date, 
+                        LosAng.end_date,
+                        LosAng.timezone))
 }
 
 #--------------------------------------------------------------#

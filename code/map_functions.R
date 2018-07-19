@@ -144,3 +144,5 @@ get.POC(28, "Denver")
 get.POC(2, "Denver")
 
 get.POC(110, "Bronx")
+
+get.POC(4008, "Los Angeles")
