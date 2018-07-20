@@ -132,6 +132,8 @@ plot(mod$gam, scale = 0)
 #--------------------------------------------------------------#
 pm_sites.hawaii <- filter.pm_sites.hawaii()
 
+plot.hourly_mean.pm(pm_sites.hawaii)
+
 mod <- NULL
 mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
             data = pm_sites.hawaii)

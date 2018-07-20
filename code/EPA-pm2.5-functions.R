@@ -266,8 +266,9 @@ filter.pm_sites.LosAng <- function(start = "2014-01-01 00:00", end = "2017-12-31
 #--------------------------------------------------------------#
 filter.pm_sites.hawaii <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
   # Specify observed site numbers
-  hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
-  # hawaii.site_nums <- c(1006)
+  # hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
+  # hawaii.site_nums <- c(1006,1012,7)
+  hawaii.site_nums <- 1006
   
   # Specify observed county names
   hawaii.county_names <- c("Hawaii")
@@ -342,7 +343,7 @@ plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
     facet_wrap(~ Month.Local) +
     geom_smooth(method = "loess", aes(group = Site.Num), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
+    labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
                        label = c("Midnight", "06:00", "Noon", "18:00", "23:00"))# +
     # ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
