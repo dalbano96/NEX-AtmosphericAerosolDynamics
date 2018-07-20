@@ -71,7 +71,7 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
                        State.Name == state_name &
                        DateTime.Local >= start_date &
                        DateTime.Local <= end_date &
-                       POC == poc)
+                       POC %in% poc)
   
   # Format to correct local time zone w/o changing the clock time
   filtered_data$DateTime.Local <- force_tz(filtered_data$DateTime.Local, tz = timezone)
@@ -89,7 +89,7 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
 #--------------------------------------------------------------#
 filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
   # Specify observed site numbers
-  reno.site_nums <- c(16)
+  reno.site_nums <- c(16, 1005)
 
   # Specify observed county names
   reno.county_names <- c("Washoe")
@@ -98,7 +98,7 @@ filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
   reno.state_name <- "Nevada"
   
   # Specify observed POC
-  reno.poc <- 3
+  reno.poc <- c(1,3)
 
   # Specify observed start date/time
   reno.start_date <- start
@@ -261,6 +261,42 @@ filter.pm_sites.LosAng <- function(start = "2014-01-01 00:00", end = "2017-12-31
 }
 
 #--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.hawaii <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+  # Specify observed site numbers
+  hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
+  # hawaii.site_nums <- c(1006)
+  
+  # Specify observed county names
+  hawaii.county_names <- c("Hawaii")
+  
+  # Specify observed State name
+  hawaii.state_name <- "Hawaii"
+  
+  # Specify observed POC
+  hawaii.poc <- 1
+  
+  # Specify observed start date/time
+  hawaii.start_date <- start
+  
+  # Specify observed start date/time
+  hawaii.end_date <- end
+  
+  # Set observed timezone
+  hawaii.timezone <- "HST"
+  
+  # Filter data
+  return(filter.pm_data(hawaii.site_nums, 
+                        hawaii.county_names, 
+                        hawaii.state_name, hawaii.poc, 
+                        hawaii.start_date, 
+                        hawaii.end_date,
+                        hawaii.timezone))
+}
+
+#--------------------------------------------------------------#
 # TODO: allow it to plot from multiple sites
 # @desc: Plots PM data for a given time range
 #   for pm2.5
@@ -292,23 +328,24 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
 #--------------------------------------------------------------#
 plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
   # # TODO: Possibly aggregate by every three months eventually
-  ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Year.Local,
+  ag <- aggregate(Sample.Measurement ~ Site.Num+Time.Local+Month.Local,
                   data, geometric.mean)
   ag %>%
-    subset(Year.Local %in% years
-           & Month.Local %in% months) %>%
+    # subset(Year.Local %in% years
+    #        & Month.Local %in% months) %>%
+    subset(Month.Local %in% months) %>%
     # ggplot(aes(x = Time.Local, y = Sample.Measurement,
     #            color = Month.Local)) +
-    ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
+    ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
     geom_point() +
     # facet_grid(Year.Local ~ Month.Local) +
     facet_wrap(~ Month.Local) +
-    geom_smooth(method = "loess", aes(group = Month.Local), se = FALSE) +
+    geom_smooth(method = "loess", aes(group = Site.Num), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
-                       label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
-    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
+                       label = c("Midnight", "06:00", "Noon", "18:00", "23:00"))# +
+    # ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
   
   
 # ### Below is a "butchered" zombie set of code

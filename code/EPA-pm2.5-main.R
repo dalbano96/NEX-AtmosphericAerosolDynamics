@@ -31,6 +31,8 @@ ggsave("figures/Reno NV/Reno-12mo1yr.png", dpi = 300)
 plot.hourly_mean.pm(pm_sites.reno, years.all, months.all[c(1,8)])
 plot.hourly_mean.pm(pm_sites.reno, years.all, months.all[c(3,6,9,12)])
 ggsave("figures/Reno-3mo4yr-01.png", dpi = 300)
+plot.hourly_mean.pm(pm_sites.reno, "2016", months.all[1:12])
+plot.hourly_mean.pm(pm_sites.reno)
 
 # Plot cyclic cubic splines for Reno, NV
 mod <- NULL
@@ -124,3 +126,15 @@ layout(1)
 mod <- gamm(Sample.Measurement ~ s(Time.Local, bs = "cc", k = 24),
             data = pm_sites.LosAng)
 plot(mod$gam, scale = 0)
+
+#--------------------------------------------------------------#
+# Hourly PM2.5 Data of Hawaii
+#--------------------------------------------------------------#
+pm_sites.hawaii <- filter.pm_sites.hawaii()
+
+mod <- NULL
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
+            data = pm_sites.hawaii)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)

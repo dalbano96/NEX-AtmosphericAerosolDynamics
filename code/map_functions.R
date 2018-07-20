@@ -146,3 +146,11 @@ get.POC(2, "Denver")
 get.POC(110, "Bronx")
 
 get.POC(4008, "Los Angeles")
+
+get.POC(2021, "Hawaii")
+get.POC(1006, "Hawaii")
+get.POC(2023, "Hawaii")
+get.POC(7, "Hawaii")
+get.POC(2016, "Hawaii")
+get.POC(2020, "Hawaii")
+get.POC(1012, "Hawaii")
