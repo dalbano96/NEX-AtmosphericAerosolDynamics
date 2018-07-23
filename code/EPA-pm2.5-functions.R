@@ -354,7 +354,9 @@ plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
-                       label = c("Midnight", "06:00", "Noon", "18:00", "23:00"))# +
+                       label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
+    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data - ", data$County.Name, ", ", data$State.Name),
+            subtitle = paste0(unique(years), collapse = ", "))
     # ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
   
   

@@ -34,7 +34,14 @@ ggsave("figures/Reno-3mo4yr-01.png", dpi = 300)
 plot.hourly_mean.pm(pm_sites.reno, "2016", months.all[1:12])
 plot.hourly_mean.pm(pm_sites.reno)
 
-# Plot cyclic cubic splines for Reno, NV
+mod <- NULL
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Season.Local), bs = "cc", k = 4) + s(Time.Local),
+            data = pm_sites.reno)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)
+
+Ar# Plot cyclic cubic splines for Reno, NV
 mod <- NULL
 mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
             data = pm_sites.reno)
@@ -87,6 +94,13 @@ plot.hourly_mean.pm(pm_sites.ny, "2016")
 plot.hourly_mean.pm(pm_sites.ny, years.all, months.all[4:8])
 
 mod <- NULL
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Season.Local), bs = "cc", k = 4) + s(Time.Local),
+            data = pm_sites.ny)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)
+
+mod <- NULL
 mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
             data = pm_sites.ny)
 layout(matrix(1:2, ncol = 2))
@@ -134,6 +148,14 @@ plot(mod$gam, scale = 0)
 pm_sites.hawaii <- filter.pm_sites.hawaii()
 
 plot.hourly_mean.pm(pm_sites.hawaii)
+
+# Cubic cyclic spline on seasonal data
+mod <- NULL
+mod <- gamm(Sample.Measurement ~ s(as.numeric(Season.Local), bs = "cc", k = 4) + s(Time.Local),
+            data = pm_sites.hawaii)
+layout(matrix(1:2, ncol = 2))
+plot(mod$gam, scale = 0)
+layout(1)
 
 mod <- NULL
 mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12) + s(Time.Local),
