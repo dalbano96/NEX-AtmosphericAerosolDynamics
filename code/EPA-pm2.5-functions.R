@@ -83,7 +83,7 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
   
   # Filters months by season, stores season to new column
   yq <- as.yearqtr(as.yearmon(filtered_data$DateTime.Local, "%m/%d/%Y") + 1/12)
-  filtered_data$Season <- factor(format(yq, "%q"), levels = 1:4,
+  filtered_data$Season.Local <- factor(format(yq, "%q"), levels = 1:4,
                                    labels = c("Winter", "Spring", "Summer", "Fall"))
   
   return(filtered_data)
@@ -335,18 +335,21 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
 #--------------------------------------------------------------#
 plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
   # # TODO: Possibly aggregate by every three months eventually
-  ag <- aggregate(Sample.Measurement ~ Site.Num+Time.Local+Month.Local,
+  # ag <- aggregate(Sample.Measurement ~ Site.Num+Time.Local+Month.Local,
+  #                 data, geometric.mean)
+  ag <- aggregate(Sample.Measurement ~ Site.Num+Time.Local+Season.Local,
                   data, geometric.mean)
   ag %>%
     # subset(Year.Local %in% years
     #        & Month.Local %in% months) %>%
-    subset(Month.Local %in% months) %>%
+    # subset(Month.Local %in% months) %>%
     # ggplot(aes(x = Time.Local, y = Sample.Measurement,
     #            color = Month.Local)) +
     ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
     geom_point() +
     # facet_grid(Year.Local ~ Month.Local) +
-    facet_wrap(~ Month.Local) +
+    # facet_wrap(~ Month.Local) +
+    facet_wrap(~ Season.Local) +
     geom_smooth(method = "loess", aes(group = Site.Num), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +

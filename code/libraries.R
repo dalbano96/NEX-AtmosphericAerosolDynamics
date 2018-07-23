@@ -38,6 +38,3 @@ months.all <- c("January",
             "October",
             "November",
             "December")
-
-
-

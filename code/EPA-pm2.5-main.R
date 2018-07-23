@@ -112,6 +112,7 @@ pm_aeronet <- function() {
 # Hourly PM2.5 Data of Los Angeles, CA
 #--------------------------------------------------------------#
 pm_sites.LosAng <- filter.pm_sites.LosAng()
+plot.hourly_mean.pm(pm_sites.LosAng)
 plot.all.pm(pm_sites.LosAng)
 pm_sites.LosAng %>%
   plot.hourly_mean.pm("2016")
