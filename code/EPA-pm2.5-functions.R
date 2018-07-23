@@ -80,6 +80,12 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
   filtered_data <- filtered_data %>%
     mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
            Year.Local = year(Date.Local))
+  
+  # Filters months by season, stores season to new column
+  yq <- as.yearqtr(as.yearmon(filtered_data$DateTime.Local, "%m/%d/%Y") + 1/12)
+  filtered_data$Season <- factor(format(yq, "%q"), levels = 1:4,
+                                   labels = c("Winter", "Spring", "Summer", "Fall"))
+  
   return(filtered_data)
 }
 

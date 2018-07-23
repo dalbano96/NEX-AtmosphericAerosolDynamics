@@ -39,9 +39,5 @@ months.all <- c("January",
             "November",
             "December")
 
-# Filters months by season automatically?
-yq <- as.yearqtr(as.yearmon(pm_sites.hawaii$DateTime.Local, "%m/%d/%Y") + 1/12)
-pm_sites.hawaii$Season <- factor(format(yq, "%q"), levels = 1:4, 
-                        labels = c("Winter", "Spring", "Summer", "Fall"))
 
 
