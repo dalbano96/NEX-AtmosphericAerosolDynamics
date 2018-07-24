@@ -334,10 +334,9 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
 # @param:
 #--------------------------------------------------------------#
 plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
-  # # TODO: Possibly aggregate by every three months eventually
   # ag <- aggregate(Sample.Measurement ~ Site.Num+Time.Local+Month.Local,
   #                 data, geometric.mean)
-  ag <- aggregate(Sample.Measurement ~ Site.Num+Time.Local+Season.Local,
+  ag <- aggregate(Sample.Measurement ~ State.Name+Time.Local+Season.Local,
                   data, geometric.mean)
   ag %>%
     # subset(Year.Local %in% years
@@ -345,12 +344,12 @@ plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
     # subset(Month.Local %in% months) %>%
     # ggplot(aes(x = Time.Local, y = Sample.Measurement,
     #            color = Month.Local)) +
-    ggplot(aes(x = Time.Local, y = Sample.Measurement, group = Site.Num, color = as.character(Site.Num))) +
+    ggplot(aes(x = Time.Local, y = Sample.Measurement, group = State.Name, color = as.character(State.Name))) +
     geom_point() +
     # facet_grid(Year.Local ~ Month.Local) +
     # facet_wrap(~ Month.Local) +
     facet_wrap(~ Season.Local) +
-    geom_smooth(method = "loess", aes(group = Site.Num), se = FALSE) +
+    geom_smooth(method = "loess", aes(group = State.Name), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
@@ -378,6 +377,39 @@ plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
 #     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
 #                        label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
 #     ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+plot.cc.monthly <- function(df, title) {
+  mod <- NULL
+  mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12),
+              data = df)
+  plot(mod$gam, scale = 0, main = paste0("Monthly - ", title))
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+plot.cc.seasonal <- function(df, title) {
+  mod <- NULL
+  mod <- gamm(Sample.Measurement ~ s(as.numeric(Season.Local), bs = "cc", k = 4),
+              data = df)
+  plot(mod$gam, scale = 0, main = paste0("Seasonal - ", title))
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+plot.cc.hourly <- function(df, title) {
+  mod <- NULL
+  mod <- gamm(Sample.Measurement ~ s(Time.Local, bs = "cc", k = 24),
+              data = df)
+  plot(mod$gam, scale = 0, main = paste0("Hourly - ", title))
 }
 
 
