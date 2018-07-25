@@ -378,9 +378,17 @@ plot.daily_mean.peak.pm <- function(df, years = years.all, months = months.all) 
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-# plot.draft <- function(df, years.all, months.all) {
-#   
-# }
+plot.draft <- function(df, years = years.all, months = months.all) {
+  df <- df %>%
+    subset(subset = Year.Local %in% years &
+             Month.Local %in% months)
+  
+  ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local, df, FUN = function(df) c(Mean = geometric.mean(df), Peak = max(df))))
+  
+  ag %>%
+    ggplot(aes(x = Sample.Measurement.Peak, y = Sample.Measurement.Mean)) +
+    geom_point()
+}
 
 #--------------------------------------------------------------#
 # @desc:
