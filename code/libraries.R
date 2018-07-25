@@ -23,6 +23,7 @@ library(sqldf)
 library(psych)
 library(mgcv)
 library(zoo)
+library(visreg)
 
 years.all <- c("2014", "2015", "2016", "2017")
 
@@ -39,7 +40,7 @@ months.all <- c("January",
             "November",
             "December")
 
-# Merging land use column
+# Merging land use column (WIP)
 system.time(epa_site_info <-read.csv("data/aqs_sites.csv", stringsAsFactors = FALSE))
 testdf <- NULL
 

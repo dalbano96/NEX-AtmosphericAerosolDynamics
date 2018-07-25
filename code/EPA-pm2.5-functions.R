@@ -328,55 +328,47 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
 }
 
 #--------------------------------------------------------------#
+# NOTE: Function is a mess :)
 # TODO: allow it to plot from multiple sites
 # @desc: Plots hourly PM averages for a given monthly period
 #   of a given year
 # @param:
 #--------------------------------------------------------------#
-plot.hourly_mean.pm <- function(data, years = years.all, months = months.all) {
-  # ag <- aggregate(Sample.Measurement ~ Site.Num+Time.Local+Month.Local,
-  #                 data, geometric.mean)
+plot.hourly_mean.pm <- function(df, years = years.all, months = months.all) {
   ag <- aggregate(Sample.Measurement ~ State.Name+Time.Local+Season.Local,
-                  data, geometric.mean)
+                  df, geometric.mean)
   ag %>%
-    # subset(Year.Local %in% years
-    #        & Month.Local %in% months) %>%
-    # subset(Month.Local %in% months) %>%
-    # ggplot(aes(x = Time.Local, y = Sample.Measurement,
-    #            color = Month.Local)) +
     ggplot(aes(x = Time.Local, y = Sample.Measurement, group = State.Name, color = as.character(State.Name))) +
     geom_point() +
-    # facet_grid(Year.Local ~ Month.Local) +
-    # facet_wrap(~ Month.Local) +
     facet_wrap(~ Season.Local) +
     geom_smooth(method = "loess", aes(group = State.Name), se = FALSE) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
                        label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
-    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data - ", data$County.Name, ", ", data$State.Name),
-            subtitle = paste0(unique(years), collapse = ", "))
-    # ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
+    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly data - ", df$County.Name, ", ", df$State.Name),
+            subtitle = paste0(unique(years), collapse = ", ")) +
+    theme_bw()
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+plot.daily_mean.peak.pm <- function(df, years = years.all, months = months.all) {
+  df <- df %>%
+    subset(subset = Year.Local %in% years &
+           Month.Local %in% months)
   
+  ag <- aggregate(Sample.Measurement ~ Date.Local,
+                  df, geometric.mean)
   
-# ### Below is a "butchered" zombie set of code
-#   # TODO: Possibly aggregate by every three months eventually
-#   ag <- aggregate(Sample.Measurement ~ Time.Local,
-#                   data, geometric.mean)
-#   ag %>%
-#     # ggplot(aes(x = Time.Local, y = Sample.Measurement,
-#     #            color = Month.Local)) +
-#     ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
-#     geom_point() +
-#     # facet_grid(Year.Local ~ Month.Local) +
-#     # facet_wrap(~ Month.Local) +
-#     # geom_smooth(method = "loess", aes(group = Month.Local), se = FALSE) +
-#     geom_smooth(method = "loess", aes(group = 1), se = FALSE) +
-#     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-#     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Month")) +
-#     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
-#                        label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
-#     ggtitle(paste0("PM2.5 FRM - Aggregated Hourly Data, ", data$State.Name), subtitle = paste0(unique(years), collapse = ", "))
+  df %>%
+    ggplot(aes(x = Date.Local, y = Sample.Measurement)) +
+    geom_boxplot(aes(group = Date.Local), outlier.shape = 1) +
+    geom_point(data = ag, aes(x = Date.Local, y = Sample.Measurement), shape = 17) +
+    labs(x = "Date", y = "PM2.5 Concentration (Micrograms/cubic meter)") +
+    ggtitle(paste0("PM2.5 FRM - Daily Average - ", df$County.Name, ", ", df$State.Name, " - ", months, " ", years))
 }
 
 #--------------------------------------------------------------#

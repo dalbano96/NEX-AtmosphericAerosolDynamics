@@ -60,3 +60,7 @@ plot.hourly_mean.pm(complete_pmsites)
 plot.cc.monthly(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
 plot.cc.seasonal(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
 plot.cc.hourly(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
+
+plot.daily_mean.peak.pm(pm_sites.hawaii, "2017", "May")
+plot.daily_mean.peak.pm(pm_sites.ny, "2017", "June")
+plot.daily_mean.peak.pm(pm_sites.reno, "2017", "May")
