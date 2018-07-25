@@ -378,16 +378,28 @@ plot.daily_mean.peak.pm <- function(df, years = years.all, months = months.all) 
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-plot.draft <- function(df, years = years.all, months = months.all) {
+plot.draft <- function(df, years = years.all, months = months.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
-             Month.Local %in% months)
+             Month.Local %in% months &
+             Season.Local %in% seasons)
   
-  ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local, df, FUN = function(df) c(Mean = geometric.mean(df), Peak = max(df))))
+  ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local, df, 
+                                      FUN = function(df) c(Mean = geometric.mean(df), 
+                                                           Peak = max(df))))
+  
+  cors <- ddply(ag, c("Season.Local"), 
+                summarise, cor = round(cor(Sample.Measurement.Mean, 
+                                Sample.Measurement.Peak), 2))
   
   ag %>%
-    ggplot(aes(x = Sample.Measurement.Peak, y = Sample.Measurement.Mean)) +
-    geom_point()
+    ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
+    geom_point() +
+    facet_wrap(~ Season.Local) +
+    labs(x = "Daily Average", y = "Daily Peak") +
+    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name)) +
+    geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
+              x = -Inf, y = Inf, hjust = -0.2, vjust = 1.2)
 }
 
 #--------------------------------------------------------------#

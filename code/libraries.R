@@ -8,6 +8,7 @@
 #--------------------------------------------------------------#
 
 library(dplyr)
+library(plyr)
 library(ggplot2)
 library(ggthemes)
 library(scales)
@@ -39,6 +40,8 @@ months.all <- c("January",
             "October",
             "November",
             "December")
+
+seasons.all <- c("Winter", "Spring", "Summer", "Fall")
 
 # Merging land use column (WIP)
 system.time(epa_site_info <-read.csv("data/aqs_sites.csv", stringsAsFactors = FALSE))
