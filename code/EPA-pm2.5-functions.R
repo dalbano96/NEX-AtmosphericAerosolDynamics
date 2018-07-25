@@ -95,7 +95,8 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
 #--------------------------------------------------------------#
 filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
   # Specify observed site numbers
-  reno.site_nums <- c(16, 1005)
+  # reno.site_nums <- c(16, 1005)
+  reno.sites_nums <- c(1005)
 
   # Specify observed county names
   reno.county_names <- c("Washoe")
@@ -341,12 +342,14 @@ plot.hourly_mean.pm <- function(df, years = years.all, months = months.all) {
     ggplot(aes(x = Time.Local, y = Sample.Measurement, group = State.Name, color = as.character(State.Name))) +
     geom_point() +
     facet_wrap(~ Season.Local) +
-    geom_smooth(method = "loess", aes(group = State.Name), se = FALSE) +
+    stat_smooth(method = "gam",
+                aes(x = Time.Local, y = Sample.Measurement),
+                formula = y ~ s(x, bs = "cc", k = 24)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
                        label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
-    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly data - ", df$County.Name, ", ", df$State.Name),
+    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly data"),
             subtitle = paste0(unique(years), collapse = ", ")) +
     theme_bw()
 }
@@ -370,6 +373,14 @@ plot.daily_mean.peak.pm <- function(df, years = years.all, months = months.all) 
     labs(x = "Date", y = "PM2.5 Concentration (Micrograms/cubic meter)") +
     ggtitle(paste0("PM2.5 FRM - Daily Average - ", df$County.Name, ", ", df$State.Name, " - ", months, " ", years))
 }
+
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+# plot.draft <- function(df, years.all, months.all) {
+#   
+# }
 
 #--------------------------------------------------------------#
 # @desc:
