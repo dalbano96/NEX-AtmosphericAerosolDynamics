@@ -26,16 +26,16 @@ load_all_csv.pm_data <- function() {
   #--------------------------------------------------------------#
   # Read ALL hourly PM data to data frame from 2014-2017
   #--------------------------------------------------------------#
-  # 1) Input CSV file
-  pm.2014 <- read_EPA_csv("data/hourly_88101_2014.csv")
-  pm.2015 <- read_EPA_csv("data/hourly_88101_2015.csv")
-  pm.2016 <- read_EPA_csv("data/hourly_88101_2016.csv")
-  pm.2017 <- read_EPA_csv("data/hourly_88101_2017.csv")
-  
-  # 2) Combine data frames (2014-2017) into single dataframe
-  pm.df <- bind_rows(pm.2014, pm.2015)
-  pm.df <- bind_rows(pm.df, pm.2016)
-  pm.df <- bind_rows(pm.df, pm.2017)
+  # # 1) Input CSV file
+  # pm.2014 <- read_EPA_csv("data/hourly_88101_2014.csv")
+  # pm.2015 <- read_EPA_csv("data/hourly_88101_2015.csv")
+  # pm.2016 <- read_EPA_csv("data/hourly_88101_2016.csv")
+  # pm.2017 <- read_EPA_csv("data/hourly_88101_2017.csv")
+  # 
+  # # 2) Combine data frames (2014-2017) into single dataframe
+  # pm.df <- bind_rows(pm.2014, pm.2015)
+  # pm.df <- bind_rows(pm.df, pm.2016)
+  # pm.df <- bind_rows(pm.df, pm.2017)
   
   # 3) Convert Date columns from character to date objects
   pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
@@ -63,12 +63,32 @@ load_all_csv.pm_data <- function() {
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-load.draft <- function(dir) {
-  setwd(dir)
+load.draft <- function() {
+  setwd("data/88101 2014-2017/")
   file_names <- list.files(pattern = "*.csv")
-  df <- do.call(rbind, lapply(file_names, read.csv))
-  setwd("/Users/darylalbano/NEX-AtmosphericAerosolDynamics/")
-  return(df)
+  pm.df <- do.call(rbind, lapply(file_names, read.csv))
+  
+  # 3) Convert Date columns from character to date objects
+  pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
+  pm.df$Date.GMT <- as.Date(pm.df$Date.GMT, format = "%F")
+  
+  # 4) Joining date and time into single column for GMT and local
+  # GMT date/time
+  pm.df$DateTime.GMT <- force_tz(as.POSIXct(paste(pm.df$Date.GMT, 
+                                                  pm.df$Time.GMT), 
+                                            format = "%Y-%m-%d %H:%M"), tz = "GMT")
+  
+  # Local date/time (will be properly localized when filtering by site)
+  pm.df$DateTime.Local <- as.POSIXct(paste(pm.df$Date.Local, 
+                                           pm.df$Time.Local), 
+                                     format = "%Y-%m-%d %H:%M")
+  
+  # 5) Convert Time columns to integer values b/w [0-23]
+  pm.df$Time.Local <- hour(hms::parse_hm(pm.df$Time.Local))
+  pm.df$Time.GMT <- hour(hms::parse_hm(pm.df$Time.GMT))
+  
+  setwd("../..")
+  return(pm.df)
 }
 
 #--------------------------------------------------------------#

@@ -8,7 +8,8 @@
 #--------------------------------------------------------------#
 
 # Load all data from csv files
-system.time(hourly.pm25.FRM.14_17 <- load_all_csv.pm_data())
+# system.time(hourly.pm25.FRM.14_17 <- load_all_csv.pm_data())
+system.time(hourly.pm25.FRM.14_17 <- load.draft())
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
