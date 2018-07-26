@@ -8,8 +8,10 @@
 #--------------------------------------------------------------#
 
 # Load all data from csv files
-# system.time(hourly.pm25.FRM.14_17 <- load_all_csv.pm_data())
-system.time(hourly.pm25.FRM.14_17 <- load.draft())
+system.time(hourly.pm25.FRM.14_17 <- load_all_csv.pm_data())
+
+# Set default values for years, months, and seasons based on available PM data
+seasons.all <- unique(hourly.pm25.FRM.14_17$Season.Local)
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
@@ -45,24 +47,12 @@ pm_sites.LosAng <- filter.pm_sites.LosAng()
 #--------------------------------------------------------------#
 pm_sites.hawaii <- filter.pm_sites.hawaii()
 
-Sys.sleep()
-
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of all sites
 #--------------------------------------------------------------#
-complete_pmsites <- NULL
-complete_pmsites <- bind_rows(pm_sites.reno, pm_sites.balt)
-complete_pmsites <- bind_rows(complete_pmsites, pm_sites.denv)
-complete_pmsites <- bind_rows(complete_pmsites, pm_sites.ny)
-complete_pmsites <- bind_rows(complete_pmsites, pm_sites.LosAng)
-complete_pmsites <- bind_rows(complete_pmsites, pm_sites.hawaii)
-
-plot.hourly_mean.pm(pm_sites.hawaii)
-
-plot.cc.monthly(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
-plot.cc.seasonal(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
-plot.cc.hourly(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
-
-plot.daily_mean.peak.pm(pm_sites.hawaii, "2017", "May")
-plot.daily_mean.peak.pm(pm_sites.ny, "2017", "June")
-plot.daily_mean.peak.pm(pm_sites.reno, "2017", "May")
+# complete_pmsites <- NULL
+# complete_pmsites <- bind_rows(pm_sites.reno, pm_sites.balt)
+# complete_pmsites <- bind_rows(complete_pmsites, pm_sites.denv)
+# complete_pmsites <- bind_rows(complete_pmsites, pm_sites.ny)
+# complete_pmsites <- bind_rows(complete_pmsites, pm_sites.LosAng)
+# complete_pmsites <- bind_rows(complete_pmsites, pm_sites.hawaii)

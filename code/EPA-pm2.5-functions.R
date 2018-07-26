@@ -12,81 +12,51 @@
 # @param:
 #--------------------------------------------------------------#
 load_all_csv.pm_data <- function() {
-  #--------------------------------------------------------------#
-  # Function to read CSV file
-  #--------------------------------------------------------------#
-  read_EPA_csv <- function(filename) {
-    df <- NULL
-    df <- read.csv(filename, stringsAsFactors = FALSE)
-    # Removes NULL and negative values from Sample.Measurement
-    df <- subset(df, Sample.Measurement > 0.00)
-    return(df)
-  }
+  # Set wd to files' location
+  setwd("data/88101 2014-2017/")
   
-  #--------------------------------------------------------------#
-  # Read ALL hourly PM data to data frame from 2014-2017
-  #--------------------------------------------------------------#
-  # # 1) Input CSV file
-  # pm.2014 <- read_EPA_csv("data/hourly_88101_2014.csv")
-  # pm.2015 <- read_EPA_csv("data/hourly_88101_2015.csv")
-  # pm.2016 <- read_EPA_csv("data/hourly_88101_2016.csv")
-  # pm.2017 <- read_EPA_csv("data/hourly_88101_2017.csv")
-  # 
-  # # 2) Combine data frames (2014-2017) into single dataframe
-  # pm.df <- bind_rows(pm.2014, pm.2015)
-  # pm.df <- bind_rows(pm.df, pm.2016)
-  # pm.df <- bind_rows(pm.df, pm.2017)
+  # Get csv filenames
+  file_names <- list.files(pattern = "*.csv")
   
-  # 3) Convert Date columns from character to date objects
+  # Load files to data frame
+  pm.df <- do.call(rbind, lapply(file_names, function(x) read.csv(x, stringsAsFactors = FALSE)))
+  
+  # Subset nonzero and positive values
+  pm.df <- pm.df %>% subset(Sample.Measurement > 0.00)
+  
+  # Convert Date columns from character to date objects
   pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
   pm.df$Date.GMT <- as.Date(pm.df$Date.GMT, format = "%F")
   
-  # 4) Joining date and time into single column for GMT and local
-  # GMT date/time
-  pm.df$DateTime.GMT <- force_tz(as.POSIXct(paste(pm.df$Date.GMT, 
-                                         pm.df$Time.GMT), 
-                                   format = "%Y-%m-%d %H:%M"), tz = "GMT")
-  
-  # Local date/time (will be properly localized when filtering by site)
+  # Joining date and time into single column for local and GMT
   pm.df$DateTime.Local <- as.POSIXct(paste(pm.df$Date.Local, 
                                            pm.df$Time.Local), 
-                                     format = "%Y-%m-%d %H:%M")
-  
-  # 5) Convert Time columns to integer values b/w [0-23]
-  pm.df$Time.Local <- hour(hms::parse_hm(pm.df$Time.Local))
-  pm.df$Time.GMT <- hour(hms::parse_hm(pm.df$Time.GMT))
-  
-  return(pm.df)
-}
-
-#--------------------------------------------------------------#
-# @desc:
-# @param:
-#--------------------------------------------------------------#
-load.draft <- function() {
-  setwd("data/88101 2014-2017/")
-  file_names <- list.files(pattern = "*.csv")
-  pm.df <- do.call(rbind, lapply(file_names, read.csv))
-  
-  # 3) Convert Date columns from character to date objects
-  pm.df$Date.Local <- as.Date(pm.df$Date.Local, format = "%F")
-  pm.df$Date.GMT <- as.Date(pm.df$Date.GMT, format = "%F")
-  
-  # 4) Joining date and time into single column for GMT and local
-  # GMT date/time
+                                     format = "%F %R")
   pm.df$DateTime.GMT <- force_tz(as.POSIXct(paste(pm.df$Date.GMT, 
                                                   pm.df$Time.GMT), 
-                                            format = "%Y-%m-%d %H:%M"), tz = "GMT")
+                                            format = "%F %R"), tz = "GMT")
   
-  # Local date/time (will be properly localized when filtering by site)
-  pm.df$DateTime.Local <- as.POSIXct(paste(pm.df$Date.Local, 
-                                           pm.df$Time.Local), 
-                                     format = "%Y-%m-%d %H:%M")
-  
-  # 5) Convert Time columns to integer values b/w [0-23]
+  # Convert Time columns to integer values b/w [0-23]
   pm.df$Time.Local <- hour(hms::parse_hm(pm.df$Time.Local))
   pm.df$Time.GMT <- hour(hms::parse_hm(pm.df$Time.GMT))
   
+  # Parse into month and year columns for Date.Local and Date.GMT
+  pm.df <- pm.df %>%
+    mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
+           Year.Local = year(Date.Local),
+           Month.GMT = month(Date.GMT, label = TRUE, abbr = FALSE),
+           Year.GMT = month(Date.GMT))
+  
+  # Cateogrizes time by season
+  temp.season.local <- as.yearqtr(as.yearmon(pm.df$DateTime.Local, "%F") + 1/12)
+  pm.df$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
+                                       labels = c("Winter", "Spring", "Summer", "Fall"))
+  
+  temp.season.gmt <- as.yearqtr(as.yearmon(pm.df$DateTime.GMT, "%F") + 1/12)
+  pm.df$Season.GMT <- factor(format(temp.season.gmt, "%q"), levels = 1:4,
+                             labels = c("Winter", "Spring", "Summer", "Fall"))
+  
+  # Finished. Set wd to project root
   setwd("../..")
   return(pm.df)
 }
@@ -98,27 +68,12 @@ load.draft <- function() {
 #   (if specified by user), timezone.
 #--------------------------------------------------------------#
 filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone = "America/Los_Angeles") {
-  filtered_data <- subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
+  return(subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
                        County.Name %in% county_names &
                        State.Name == state_name &
                        DateTime.Local >= start_date &
                        DateTime.Local <= end_date &
-                       POC %in% poc)
-  
-  # Format to correct local time zone w/o changing the clock time
-  filtered_data$DateTime.Local <- force_tz(filtered_data$DateTime.Local, tz = timezone)
-  
-  # Parse Date.Local into month and year columns
-  filtered_data <- filtered_data %>%
-    mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
-           Year.Local = year(Date.Local))
-  
-  # Filters months by season, stores season to new column
-  yq <- as.yearqtr(as.yearmon(filtered_data$DateTime.Local, "%m/%d/%Y") + 1/12)
-  filtered_data$Season.Local <- factor(format(yq, "%q"), levels = 1:4,
-                                   labels = c("Winter", "Spring", "Summer", "Fall"))
-  
-  return(filtered_data)
+                       POC %in% poc))
 }
 
 #--------------------------------------------------------------#
@@ -128,7 +83,7 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
 filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
   # Specify observed site numbers
   # reno.site_nums <- c(16, 1005)
-  reno.sites_nums <- c(1005)
+  reno.site_nums <- c(1005)
 
   # Specify observed county names
   reno.county_names <- c("Washoe")
@@ -367,7 +322,7 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
 #   of a given year
 # @param:
 #--------------------------------------------------------------#
-plot.hourly_mean.pm <- function(df, years = years.all, months = months.all) {
+plot.hourly_mean.pm <- function(df, years = years.all, months = months.all, seasons = seasons.all) {
   ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Season.Local,
                   df, geometric.mean)
   ag %>%
@@ -390,7 +345,7 @@ plot.hourly_mean.pm <- function(df, years = years.all, months = months.all) {
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-plot.daily_mean.peak.pm <- function(df, years = years.all, months = months.all) {
+plot.daily_mean_peak.pm <- function(df, years = years.all, months = months.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
            Month.Local %in% months)
@@ -407,17 +362,17 @@ plot.daily_mean.peak.pm <- function(df, years = years.all, months = months.all) 
 }
 
 #--------------------------------------------------------------#
-# @desc:
-# @param:
+# @desc: Plots correlation b/w daily average and daily peak
+# @param: 
 #--------------------------------------------------------------#
-plot.draft <- function(df, years = years.all, months = months.all, seasons = seasons.all) {
+plot.r2.daily_avg_peak.pm <- function(df, years = years.all, months = months.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
              Month.Local %in% months &
              Season.Local %in% seasons)
   
   ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Month.Local+Season.Local, df, 
-                                      FUN = function(df) c(Mean = mean(df), 
+                                      FUN = function(df) c(Mean = geometric.mean(df), 
                                                            Peak = max(df))))
   
   cors <- ddply(ag, c("Season.Local"), 
@@ -437,38 +392,39 @@ plot.draft <- function(df, years = years.all, months = months.all, seasons = sea
     theme_bw()
 }
 
-#--------------------------------------------------------------#
-# @desc:
-# @param:
-#--------------------------------------------------------------#
-plot.cc.monthly <- function(df, title) {
-  mod <- NULL
-  mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12),
-              data = df)
-  plot(mod$gam, scale = 0, main = paste0("Monthly - ", title))
-}
 
-#--------------------------------------------------------------#
-# @desc:
-# @param:
-#--------------------------------------------------------------#
-plot.cc.seasonal <- function(df, title) {
-  mod <- NULL
-  mod <- gamm(Sample.Measurement ~ s(as.numeric(Season.Local), bs = "cc", k = 4),
-              data = df)
-  plot(mod$gam, scale = 0, main = paste0("Seasonal - ", title))
-}
-
-#--------------------------------------------------------------#
-# @desc:
-# @param:
-#--------------------------------------------------------------#
-plot.cc.hourly <- function(df, title) {
-  mod <- NULL
-  mod <- gamm(Sample.Measurement ~ s(Time.Local, bs = "cc", k = 24),
-              data = df)
-  plot(mod$gam, scale = 0, main = paste0("Hourly - ", title))
-}
+# #--------------------------------------------------------------#
+# # @desc:
+# # @param:
+# #--------------------------------------------------------------#
+# plot.cc.monthly <- function(df, title) {
+#   mod <- NULL
+#   mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12),
+#               data = df)
+#   plot(mod$gam, scale = 0, main = paste0("Monthly - ", title))
+# }
+# 
+# #--------------------------------------------------------------#
+# # @desc:
+# # @param:
+# #--------------------------------------------------------------#
+# plot.cc.seasonal <- function(df, title) {
+#   mod <- NULL
+#   mod <- gamm(Sample.Measurement ~ s(as.numeric(Season.Local), bs = "cc", k = 4),
+#               data = df)
+#   plot(mod$gam, scale = 0, main = paste0("Seasonal - ", title))
+# }
+# 
+# #--------------------------------------------------------------#
+# # @desc:
+# # @param:
+# #--------------------------------------------------------------#
+# plot.cc.hourly <- function(df, title) {
+#   mod <- NULL
+#   mod <- gamm(Sample.Measurement ~ s(Time.Local, bs = "cc", k = 24),
+#               data = df)
+#   plot(mod$gam, scale = 0, main = paste0("Hourly - ", title))
+# }
 
 
 # 

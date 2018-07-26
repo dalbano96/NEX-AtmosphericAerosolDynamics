@@ -43,14 +43,14 @@ months.all <- c("January",
 
 seasons.all <- c("Winter", "Spring", "Summer", "Fall")
 
-# Merging land use column (WIP)
-system.time(epa_site_info <-read.csv("data/aqs_sites.csv", stringsAsFactors = FALSE))
-testdf <- NULL
-
-# system.time(testdf <- semi_join(hourly.pm25.FRM.14_17, epa_site_info, by = c("Latitude", "Longitude")))
-
-system.time(testdf <- hourly.pm25.FRM.14_17 %>%
-              right_join(epa_site_info, by = c("Latitude", "Longitude")))
-
-
-
+# # Merging land use column (WIP)
+# system.time(epa_site_info <-read.csv("data/aqs_sites.csv", stringsAsFactors = FALSE))
+# testdf <- NULL
+# 
+# # system.time(testdf <- semi_join(hourly.pm25.FRM.14_17, epa_site_info, by = c("Latitude", "Longitude")))
+# 
+# system.time(testdf <- hourly.pm25.FRM.14_17 %>%
+#               right_join(epa_site_info, by = c("Latitude", "Longitude")))
+# 
+# 
+# 
