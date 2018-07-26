@@ -60,6 +60,18 @@ load_all_csv.pm_data <- function() {
 }
 
 #--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+load.draft <- function(dir) {
+  setwd(dir)
+  file_names <- list.files(pattern = "*.csv")
+  df <- do.call(rbind, lapply(file_names, read.csv))
+  setwd("/Users/darylalbano/NEX-AtmosphericAerosolDynamics/")
+  return(df)
+}
+
+#--------------------------------------------------------------#
 # @desc: Filters PM data frame based on specified location.
 # @param: PM SITE INFO ->Site number(s), county names(s),
 #   state name, start date (if specified by user), end date
@@ -336,10 +348,10 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
 # @param:
 #--------------------------------------------------------------#
 plot.hourly_mean.pm <- function(df, years = years.all, months = months.all) {
-  ag <- aggregate(Sample.Measurement ~ State.Name+Time.Local+Season.Local,
+  ag <- aggregate(Sample.Measurement ~ Time.Local+Month.Local+Season.Local,
                   df, geometric.mean)
   ag %>%
-    ggplot(aes(x = Time.Local, y = Sample.Measurement, group = State.Name, color = as.character(State.Name))) +
+    ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
     geom_point() +
     facet_wrap(~ Season.Local) +
     stat_smooth(method = "gam",
@@ -349,7 +361,7 @@ plot.hourly_mean.pm <- function(df, years = years.all, months = months.all) {
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
                        label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
-    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly data"),
+    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly data - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
     theme_bw()
 }
@@ -384,8 +396,8 @@ plot.draft <- function(df, years = years.all, months = months.all, seasons = sea
              Month.Local %in% months &
              Season.Local %in% seasons)
   
-  ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local, df, 
-                                      FUN = function(df) c(Mean = geometric.mean(df), 
+  ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Month.Local+Season.Local, df, 
+                                      FUN = function(df) c(Mean = mean(df), 
                                                            Peak = max(df))))
   
   cors <- ddply(ag, c("Season.Local"), 
@@ -395,11 +407,14 @@ plot.draft <- function(df, years = years.all, months = months.all, seasons = sea
   ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
     geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
     facet_wrap(~ Season.Local) +
     labs(x = "Daily Average", y = "Daily Peak") +
-    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name)) +
+    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
+                   subtitle = paste0(unique(years), collapse = ", ")) +
     geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
-              x = -Inf, y = Inf, hjust = -0.2, vjust = 1.2)
+              x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
+    theme_bw()
 }
 
 #--------------------------------------------------------------#

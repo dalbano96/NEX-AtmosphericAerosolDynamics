@@ -57,7 +57,7 @@ complete_pmsites <- bind_rows(complete_pmsites, pm_sites.LosAng)
 complete_pmsites <- bind_rows(complete_pmsites, pm_sites.hawaii)
 
 plot.hourly_mean.pm(pm_sites.hawaii)
-plot.hourly_mean.pm(complete_pmsites)
+
 plot.cc.monthly(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
 plot.cc.seasonal(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
 plot.cc.hourly(complete_pmsites, "Reno, Baltimore, Denver, New York, Los Angeles, Hawaii")
