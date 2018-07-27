@@ -19,7 +19,7 @@ seasons.all <- unique(hourly.pm25.FRM.14_17$Season.Local)
 # Hourly PM2.5 Data of Reno, NV
 #--------------------------------------------------------------#
 # Here is where the pm data is filtered for Reno sites.
-# Reno filter function contains specific filter parameters for Reno (Site number, County, etc.)
+# Reno filter function contains specific filte r parameters for Reno (Site number, County, etc.)
 # Date can be specified. If not, default date range includes all data from [2014-01-01 to 2017-12-31]
 pm_sites.reno <- filter.pm_sites.reno()
 
