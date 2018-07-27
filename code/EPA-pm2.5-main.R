@@ -11,6 +11,8 @@
 system.time(hourly.pm25.FRM.14_17 <- load_all_csv.pm_data())
 
 # Set default values for years, months, and seasons based on available PM data
+years.all <- unique(hourly.pm25.FRM.14_17$Year.Local)
+months.all <- unique(hourly.pm25.FRM.14_17$Month.Local)
 seasons.all <- unique(hourly.pm25.FRM.14_17$Season.Local)
 
 #--------------------------------------------------------------#

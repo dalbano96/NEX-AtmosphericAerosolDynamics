@@ -67,12 +67,10 @@ load_all_csv.pm_data <- function() {
 #   state name, start date (if specified by user), end date
 #   (if specified by user), timezone.
 #--------------------------------------------------------------#
-filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date, end_date, timezone = "America/Los_Angeles") {
+filter.pm_data <- function(site_nums, county_names, state_name, poc) {
   return(subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
                        County.Name %in% county_names &
                        State.Name == state_name &
-                       DateTime.Local >= start_date &
-                       DateTime.Local <= end_date &
                        POC %in% poc))
 }
 
@@ -80,7 +78,7 @@ filter.pm_data <- function(site_nums, county_names, state_name, poc, start_date,
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+filter.pm_sites.reno <- function() {
   # Specify observed site numbers
   # reno.site_nums <- c(16, 1005)
   reno.site_nums <- c(1005)
@@ -93,30 +91,19 @@ filter.pm_sites.reno <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
   
   # Specify observed POC
   reno.poc <- c(1,3)
-
-  # Specify observed start date/time
-  reno.start_date <- start
-  
-  # Specify observed start date/time
-  reno.end_date <- end
-  
-  # Set observed timezone
-  reno.timezone <- "America/Los_Angeles"
   
   # Filter data
   return(filter.pm_data(reno.site_nums, 
                         reno.county_names, 
-                        reno.state_name, reno.poc, 
-                        reno.start_date, 
-                        reno.end_date,
-                        reno.timezone))
+                        reno.state_name,
+                        reno.poc))
 }
 
 #--------------------------------------------------------------#
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_sites.balt <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+filter.pm_sites.balt <- function() {
   # Specify observed site numbers
   balt.site_nums <- c(40)
   
@@ -129,29 +116,18 @@ filter.pm_sites.balt <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
   # Specify observed POC
   balt.poc <- 3
   
-  # Specify observed start date/time
-  balt.start_date <- start
-  
-  # Specify observed start date/time
-  balt.end_date <- end
-  
-  # Set observed timezone
-  balt.timezone <- "America/New_York"
-  
   # Filter data
   return(filter.pm_data(balt.site_nums, 
                         balt.county_names, 
-                        balt.state_name, balt.poc, 
-                        balt.start_date, 
-                        balt.end_date,
-                        balt.timezone))
+                        balt.state_name,
+                        balt.poc))
 }
 
 #--------------------------------------------------------------#
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_sites.denv <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+filter.pm_sites.denv <- function() {
   # Specify observed site numbers
   # denv.site_nums <- c(26, 28, 2)
   denv.site_nums <- c(2)
@@ -165,29 +141,18 @@ filter.pm_sites.denv <- function(start = "2014-01-01 00:00", end = "2017-12-31 2
   # Specify observed POC
   denv.poc <- 3
   
-  # Specify observed start date/time
-  denv.start_date <- start
-  
-  # Specify observed start date/time
-  denv.end_date <- end
-  
-  # Set observed timezone
-  denv.timezone <- "America/Denver"
-  
   # Filter data
   return(filter.pm_data(denv.site_nums, 
                         denv.county_names, 
-                        denv.state_name, denv.poc, 
-                        denv.start_date, 
-                        denv.end_date,
-                        denv.timezone))
+                        denv.state_name,
+                        denv.poc))
 }
 
 #--------------------------------------------------------------#
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_sites.ny <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+filter.pm_sites.ny <- function() {
   # Specify observed site numbers
   # ny.site_nums <- c(26, 28, 2)
   ny.site_nums <- c(110)
@@ -201,29 +166,18 @@ filter.pm_sites.ny <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:
   # Specify observed POC
   ny.poc <- 4
   
-  # Specify observed start date/time
-  ny.start_date <- start
-  
-  # Specify observed start date/time
-  ny.end_date <- end
-  
-  # Set observed timezone
-  ny.timezone <- "America/New_York"
-  
   # Filter data
   return(filter.pm_data(ny.site_nums, 
                         ny.county_names, 
-                        ny.state_name, ny.poc, 
-                        ny.start_date, 
-                        ny.end_date,
-                        ny.timezone))
+                        ny.state_name,
+                        ny.poc))
 }
 
 #--------------------------------------------------------------#
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_sites.LosAng <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+filter.pm_sites.LosAng <- function() {
   # Specify observed site numbers
   LosAng.site_nums <- c(4008)
   
@@ -236,29 +190,18 @@ filter.pm_sites.LosAng <- function(start = "2014-01-01 00:00", end = "2017-12-31
   # Specify observed POC
   LosAng.poc <- 3
   
-  # Specify observed start date/time
-  LosAng.start_date <- start
-  
-  # Specify observed start date/time
-  LosAng.end_date <- end
-  
-  # Set observed timezone
-  LosAng.timezone <- "America/Los_Angeles"
-  
   # Filter data
   return(filter.pm_data(LosAng.site_nums, 
                         LosAng.county_names, 
-                        LosAng.state_name, LosAng.poc, 
-                        LosAng.start_date, 
-                        LosAng.end_date,
-                        LosAng.timezone))
+                        LosAng.state_name,
+                        LosAng.poc))
 }
 
 #--------------------------------------------------------------#
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-filter.pm_sites.hawaii <- function(start = "2014-01-01 00:00", end = "2017-12-31 23:00") {
+filter.pm_sites.hawaii <- function() {
   # Specify observed site numbers
   # hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
   # hawaii.site_nums <- c(1006,1012,7)
@@ -273,22 +216,11 @@ filter.pm_sites.hawaii <- function(start = "2014-01-01 00:00", end = "2017-12-31
   # Specify observed POC
   hawaii.poc <- 1
   
-  # Specify observed start date/time
-  hawaii.start_date <- start
-  
-  # Specify observed start date/time
-  hawaii.end_date <- end
-  
-  # Set observed timezone
-  hawaii.timezone <- "HST"
-  
   # Filter data
   return(filter.pm_data(hawaii.site_nums, 
                         hawaii.county_names, 
-                        hawaii.state_name, hawaii.poc, 
-                        hawaii.start_date, 
-                        hawaii.end_date,
-                        hawaii.timezone))
+                        hawaii.state_name,
+                        hawaii.poc))
 }
 
 #--------------------------------------------------------------#
@@ -304,11 +236,10 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
     ggplot(aes(x = strptime(DateTime.Local, format = "%F %H:%M"), 
                y = Sample.Measurement, 
                group = Site.Num, color = as.character(Site.Num))) +
-    geom_point(position = position_dodge(width = 0.75)) +
-    # geom_smooth(method = "loess", se = FALSE, linetype = 2, span = 0.2, color = "black", aes(group = 1)) +
+    geom_point() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Time", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = "Sites") +
-    # scale_x_datetime(date_breaks = "3 months") +
+    scale_x_datetime(date_breaks = "3 months") +
     ggtitle(paste0(data$State.Name, " [", 
                    head(data$DateTime.Local, n = 1), " to ", 
                    tail(data$DateTime.Local, n = 1), "] ", "POC: ", 
