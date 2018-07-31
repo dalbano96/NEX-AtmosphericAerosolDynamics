@@ -10,6 +10,11 @@
 #--------------------------------------------------------------#
 # Read AOD csv to data frame (These will be loaded onto db)
 #--------------------------------------------------------------#
+system.time(all.aod <- load_all.aod_data())
+
+#--------------------------------------------------------------#
+# Read AOD csv to data frame (These will be loaded onto db)
+#--------------------------------------------------------------#
 # 1) Importing AOD datasets
 hourly.AOD.AMES.14_17 <- NULL
 hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_20171231_NASA_Ames.csv", stringsAsFactors = FALSE)
@@ -18,8 +23,8 @@ hourly.AOD.AMES.14_17 <- read.csv("data/20140101_20171231_NASA_Ames/20140101_201
 hourly.AOD.AMES.14_17$Date.dd.mm.yyyy. <- as.Date(hourly.AOD.AMES.14_17$Date.dd.mm.yyyy., format = "%m/%d/%y")
 
 # 3) Rename date/time columns to Date.GMT and Time.GMT since those units were measured in GMT time zone
-hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Date.GMT = Date.dd.mm.yyyy.)
-hourly.AOD.AMES.14_17 <- rename(hourly.AOD.AMES.14_17, Time.GMT = Time.hh.mm.ss.)
+hourly.AOD.AMES.14_17 <- dplyr::rename(hourly.AOD.AMES.14_17, Date.GMT = Date.dd.mm.yyyy.)
+hourly.AOD.AMES.14_17 <- dplyr::rename(hourly.AOD.AMES.14_17, Time.GMT = Time.hh.mm.ss.)
 
 # 4) Joining date and time into a new column "DateTime.GMT"
 # Setting to GMT time zone

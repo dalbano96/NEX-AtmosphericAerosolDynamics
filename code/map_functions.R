@@ -55,16 +55,17 @@ aod.sites <- bind_rows(aod.sites, aod.2017)
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
 leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name)))) %>%
-  addCircles(data = unique(select(aod.sites, 
-                                  c(Longitude.decimal_degrees.,
-                                    Latitude.decimal_degrees.,
-                                    Site_Name))),
+  # AERONET Sites
+  addCircles(data = unique(select(all.aod, c(Longitude.decimal_degrees., Latitude.decimal_degrees., Site_Name))),
              lng = ~Longitude.decimal_degrees.,
              lat = ~Latitude.decimal_degrees.,
              color = "red",
              radius = 5000,
              label = ~paste("[AERONET] Site Name: ", Site_Name)) %>%
-  addCircles(~Longitude, ~Latitude,
+  # EPA Sites
+  addCircles(data = unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name))), 
+             lng = ~Longitude, 
+             lat = ~Latitude,
              label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
                             "County Name: ", County.Name)) %>%
   addTiles() %>%

@@ -277,7 +277,7 @@ plot.hourly_mean.pm <- function(df, years = years.all, seasons = seasons.all) {
 }
 
 #--------------------------------------------------------------#
-# (In Progress)
+# (In Progress) - Box/Whisker plot
 # @desc:
 # @param:
 #--------------------------------------------------------------#
@@ -321,7 +321,8 @@ plot.r2.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.a
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
     geom_point() +
     geom_smooth(method = "lm", se = FALSE) +
-    facet_grid(Season.Local ~ Year.Local) +
+    # facet_grid(Season.Local ~ Year.Local) +
+    facet_wrap(~ Season.Local) +
     labs(x = "Daily Average", y = "Daily Peak") +
     ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
@@ -329,7 +330,6 @@ plot.r2.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.a
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     theme_bw()
 }
-
 
 # #--------------------------------------------------------------#
 # # @desc:

@@ -1,3 +1,16 @@
+#--------------------------------------------------------------#
+# Daryl Albano
+# NEX - NASA Ames
+# Summer 2018
+# Atmospheric Aerosol Dynamics
+# AERONET-AOD-functions.R
+# Desc - 
+#--------------------------------------------------------------#
+
+#--------------------------------------------------------------#
+# Read AOD to data frame (In progress)
+#--------------------------------------------------------------#
+
 # import ALL AERONET file into MonetDBlite on disk (even if you don't have much RAM)
 # the trick is that it has some metadata lines at the top
 library(MonetDBLite)
@@ -69,14 +82,20 @@ mdb_aeronet <- tbl(mdb_src, "allaeronet")
 
 # and now we can use dplyr verbs to work with the underlying object
 # https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
-mdb_aeronet %>% summarise(n = n())
+# mdb_aeronet %>% summarise(n = n())
 glimpse(mdb_aeronet)
 # next steps would be to filter down to the subset of data we want and work with it
+
+aod.df <- as.data.frame(mdb_aeronet)
 
 # shut it down when done
 dbDisconnect(mdb, shutdown = TRUE)
 
+
 # if the dbdir was a non-temporary location then the data remain there
 utils:::format.object_size(sum(file.info(list.files(dbdir, all.files = TRUE, full.names = TRUE, recursive = TRUE))$size), "auto")
+
+# return data frame
+# return(aod.df)
 
 
