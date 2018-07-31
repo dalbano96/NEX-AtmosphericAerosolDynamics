@@ -13,9 +13,6 @@
 load_all.aod_data <- function (){  
   # import ALL AERONET file into MonetDBlite on disk (even if you don't have much RAM)
   # the trick is that it has some metadata lines at the top
-  library(MonetDBLite)
-  library(DBI)
-  library(dplyr)
   
   ### file paths you will need to change
   # absolute path to downloaded Aeronet data (e.g. version 3 level 2.0)
@@ -77,8 +74,8 @@ load_all.aod_data <- function (){
                                                 "' USING  DELIMITERS ',' NULL as ''"))))
   
   # now wire it up to dplyr
-  mdb_src <- src_monetdb(embedded="/Users/darylalbano/Downloads/rudis/")
-  mdb_aeronet <- tbl(mdb_src, "allaeronet")
+  mdb_src <- MonetDBLite::src_monetdb(embedded="/Users/darylalbano/Downloads/rudis/")
+  mdb_aeronet <- dplyr::tbl(mdb_src, "allaeronet")
   
   # and now we can use dplyr verbs to work with the underlying object
   # https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
