@@ -74,8 +74,9 @@ load_all.aod_data <- function (){
                                                 "' USING  DELIMITERS ',' NULL as ''"))))
   
   # now wire it up to dplyr
-  mdb_src <- MonetDBLite::src_monetdb(embedded="/Users/darylalbano/Downloads/rudis/")
-  mdb_aeronet <- dplyr::tbl(mdb_src, "allaeronet")
+  # mdb_src <- src_monetdb(embedded="/Users/darylalbano/Downloads/rudis/")
+  mdb_src <- src_monetdb(embedded="/Users/darylalbano/Downloads/rudis/")
+  mdb_aeronet <- dplyr::tbl(src = mdb_src, "allaeronet")
   
   # and now we can use dplyr verbs to work with the underlying object
   # https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf

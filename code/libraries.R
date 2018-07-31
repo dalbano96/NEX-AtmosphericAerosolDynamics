@@ -7,7 +7,6 @@
 # Desc - Contains libraries used in workspace
 #--------------------------------------------------------------#
 
-library(dplyr)
 library(plyr)
 library(ggplot2)
 library(ggthemes)
@@ -27,3 +26,4 @@ library(zoo)
 library(visreg)
 library(MonetDBLite)
 library(DBI)
+library(dplyr)
