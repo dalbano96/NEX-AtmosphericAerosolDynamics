@@ -50,18 +50,20 @@ aod.sites <- bind_rows(aod.2014, aod.2015)
 aod.sites <- bind_rows(aod.sites, aod.2016)
 aod.sites <- bind_rows(aod.sites, aod.2017)
 
+# Above code deals with AERONET Sites
+
 #--------------------------------------------------------------#
 # Map all site locations from 2014-2017
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
 leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name)))) %>%
   # AERONET Sites
-  addCircles(data = unique(select(all.aod, c(Longitude.decimal_degrees., Latitude.decimal_degrees., Site_Name))),
-             lng = ~Longitude.decimal_degrees.,
-             lat = ~Latitude.decimal_degrees.,
+  addCircles(data = unique(select(all.aod, c(Site_Longitude.Degrees., Site_Latitude.Degrees., AERONET_Site))),
+             lng = ~Site_Longitude.Degrees.,
+             lat = ~Site_Latitude.Degrees.,
              color = "red",
              radius = 5000,
-             label = ~paste("[AERONET] Site Name: ", Site_Name)) %>%
+             label = ~paste("[AERONET] Site Name: ", AERONET_Site)) %>%
   # EPA Sites
   addCircles(data = unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name))), 
              lng = ~Longitude, 
