@@ -331,52 +331,42 @@ plot.r2.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.a
     theme_bw()
 }
 
-# #--------------------------------------------------------------#
-# # @desc:
-# # @param:
-# #--------------------------------------------------------------#
-# plot.cc.monthly <- function(df, title) {
-#   mod <- NULL
-#   mod <- gamm(Sample.Measurement ~ s(as.numeric(Month.Local), bs = "cc", k = 12),
-#               data = df)
-#   plot(mod$gam, scale = 0, main = paste0("Monthly - ", title))
-# }
-# 
-# #--------------------------------------------------------------#
-# # @desc:
-# # @param:
-# #--------------------------------------------------------------#
-# plot.cc.seasonal <- function(df, title) {
-#   mod <- NULL
-#   mod <- gamm(Sample.Measurement ~ s(as.numeric(Season.Local), bs = "cc", k = 4),
-#               data = df)
-#   plot(mod$gam, scale = 0, main = paste0("Seasonal - ", title))
-# }
-# 
-# #--------------------------------------------------------------#
-# # @desc:
-# # @param:
-# #--------------------------------------------------------------#
-# plot.cc.hourly <- function(df, title) {
-#   mod <- NULL
-#   mod <- gamm(Sample.Measurement ~ s(Time.Local, bs = "cc", k = 24),
-#               data = df)
-#   plot(mod$gam, scale = 0, main = paste0("Hourly - ", title))
-# }
-
-
-# 
-# acf(resid(mod$lme), lag.max = 36, main = "ACF")
-# pacf(resid(mod$lme), lag.max = 36, main = "pACF")
-# layout(1)
-
-# Testing db integration
-# dbdir <- file.path("data/", 'NEX-AAS-db.db')
-# con <- dbConnect(SQLite(), dbdir)
-# 
-# dbListTables(con)
-# src_sqlite(embedded = "data/NEX-AAS-db.db")
-# sqlite_pm <- tbl(src_sqlite, "hourly_88101_2015")
-# dbListFields(con, "hourly_88101_2015")
-# 
-# dbDisconnect(con, shutdown = TRUE)
+#--------------------------------------------------------------#
+# (WIP)
+# @desc: 
+# @param: 
+#--------------------------------------------------------------#
+plot.r2.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.all) {
+  pm.df <- pm.df %>%
+    subset(subset = Year.Local %in% years &
+             Season.Local %in% seasons)
+  
+  aod.df <- aod.df  %>%
+    subset(subset = Year.Local %in% years &
+             Season.Local %in% seasons)
+  
+  pm.ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, pm.df, 
+                                      FUN = function(pm.df) c(Mean = mean(pm.df), 
+                                                           Peak = max(pm.df))))
+  
+  aod.ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, aod.df, 
+                                         FUN = function(aod.df) c(Mean = mean(aod.df), 
+                                                                 Peak = max(aod.df))))
+  
+  cors <- ddply(ag, c("Season.Local"), 
+                summarise, cor = round(cor(Sample.Measurement.Mean, 
+                                           Sample.Measurement.Peak), 2))
+  
+  ag %>%
+    ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
+    # facet_grid(Season.Local ~ Year.Local) +
+    facet_wrap(~ Season.Local) +
+    labs(x = "Daily Average", y = "Daily Peak") +
+    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
+            subtitle = paste0(unique(years), collapse = ", ")) +
+    geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
+              x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
+    theme_bw()
+}

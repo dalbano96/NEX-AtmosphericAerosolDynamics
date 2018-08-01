@@ -111,5 +111,16 @@ load_all.aod_data <- function (){
 }
 
 
-  
-  
+# Test Code below
+ames.aod <- subset(all.aod, AERONET_Site == "NASA_Ames")
+ames.aod$DateTime.Local <- with_tz(ames.aod$DateTime.GMT, tzone = "US/Pacific")
+# head(select(ames.aod, c("DateTime.GMT", "DateTime.Local")), n = 20)
+
+ames.aod$Time.Local <- hms::as.hms(ames.aod$DateTime.Local)
+ames.aod$Date.Local <- lubridate::date(ames.aod$DateTime.Local)
+ames.aod$Year.Local <- lubridate::year(ames.aod$DateTime.Local)
+ames.aod$Month.Local <- lubridate::month(ames.aod$DateTime.Local, label = TRUE, abbr = FALSE)
+
+temp.season.local <- as.yearqtr(as.yearmon(ames.aod$DateTime.Local, "%F") + 1/12)
+ames.aod$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
+                                labels = c("Winter", "Spring", "Summer", "Fall"))

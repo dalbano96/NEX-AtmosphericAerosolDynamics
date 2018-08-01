@@ -58,7 +58,7 @@ aod.sites <- bind_rows(aod.sites, aod.2017)
 #--------------------------------------------------------------#
 leaflet(unique(select(hourly.pm25.FRM.14_17, c(Longitude, Latitude, Site.Num, County.Name)))) %>%
   # AERONET Sites
-  addCircles(data = unique(select(all.aod, c(Site_Longitude.Degrees., Site_Latitude.Degrees., AERONET_Site))),
+  addCircles(data = unique(select(subset(all.aod, DateTime.GMT >= "2014-01-01" & DateTime.GMT <= "2017-12-31"), c(Site_Longitude.Degrees., Site_Latitude.Degrees., AERONET_Site))),
              lng = ~Site_Longitude.Degrees.,
              lat = ~Site_Latitude.Degrees.,
              color = "red",
