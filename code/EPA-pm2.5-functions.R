@@ -323,7 +323,7 @@ plot.r2.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.a
     geom_smooth(method = "lm", se = FALSE) +
     # facet_grid(Season.Local ~ Year.Local) +
     facet_wrap(~ Season.Local) +
-    labs(x = "Daily Average", y = "Daily Peak") +
+    # labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
     ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
     geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
@@ -345,17 +345,17 @@ plot.r2.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.a
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons)
   
+  # Calculates average and peak values for sample measurement of PM
   pm.ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, pm.df, 
                                       FUN = function(pm.df) c(Mean = mean(pm.df), 
                                                            Peak = max(pm.df))))
   
+  # Calculates average and peak values for sample measurement of AOD
   aod.ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, aod.df, 
                                          FUN = function(aod.df) c(Mean = mean(aod.df), 
                                                                  Peak = max(aod.df))))
-  
-  cors <- ddply(ag, c("Season.Local"), 
-                summarise, cor = round(cor(Sample.Measurement.Mean, 
-                                           Sample.Measurement.Peak), 2))
+  # TODO: Merge aod and pm? - This would be problematic...
+  cors <- cor(x = pm.ag$Sample.Measurement, y = aod.ag$Sample.Measurement)
   
   ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +

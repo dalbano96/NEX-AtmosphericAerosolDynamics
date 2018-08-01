@@ -124,3 +124,35 @@ ames.aod$Month.Local <- lubridate::month(ames.aod$DateTime.Local, label = TRUE, 
 temp.season.local <- as.yearqtr(as.yearmon(ames.aod$DateTime.Local, "%F") + 1/12)
 ames.aod$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
                                 labels = c("Winter", "Spring", "Summer", "Fall"))
+
+#--------------------------------------------------------------#
+# @desc: Plots correlation b/w daily average and daily peak
+# @param: 
+#--------------------------------------------------------------#
+plot.r2.daily_avg_peak.aod <- function(df, years = years.all, seasons = seasons.all) {
+  df <- df %>%
+    subset(subset = Year.Local %in% years &
+             Season.Local %in% seasons &
+             AOD_440nm > -50)
+  
+  ag <- do.call(data.frame, aggregate(AOD_440nm ~ Date.Local+Season.Local+Year.Local, df, 
+                                      FUN = function(df) c(Mean = mean(df), 
+                                                           Peak = max(df))))
+  
+  cors <- ddply(ag, c("Season.Local"), 
+                summarise, cor = round(cor(AOD_440nm.Mean, 
+                                           AOD_440nm.Peak), 2))
+  
+  ag %>%
+    ggplot(aes(x = AOD_440nm.Mean, y = AOD_440nm.Peak)) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
+    # facet_grid(Season.Local ~ Year.Local) +
+    facet_wrap(~ Season.Local) +
+    labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
+    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
+            subtitle = paste0(unique(years), collapse = ", ")) +
+    geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
+              x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
+    theme_bw()
+}
