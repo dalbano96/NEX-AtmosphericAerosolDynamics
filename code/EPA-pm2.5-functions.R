@@ -214,7 +214,7 @@ filter.pm_sites.hawaii <- function() {
   hawaii.state_name <- "Hawaii"
   
   # Specify observed POC
-  hawaii.poc <- 1
+  hawaii.poc <- NULL
   
   # Filter data
   return(filter.pm_data(hawaii.site_nums, 
@@ -326,7 +326,7 @@ plot.r2.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.a
     # labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
     ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
-    geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
+    geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     theme_bw()
 }
@@ -366,7 +366,7 @@ plot.r2.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.a
     labs(x = "Daily Average", y = "Daily Peak") +
     ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
-    geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
+    geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     theme_bw()
 }

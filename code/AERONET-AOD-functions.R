@@ -128,6 +128,26 @@ temp.season.local <- as.yearqtr(as.yearmon(ames.aod$DateTime.Local, "%F") + 1/12
 ames.aod$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
                                 labels = c("Winter", "Spring", "Summer", "Fall"))
 
+filter.aod_data <- function() {
+  
+}
+
+filter.aod_sites.reno <- function() {
+  
+}
+
+filter.aod_sites.denv <- function() {
+  
+}
+
+filter.aod_sites.balt <- function() {
+  
+}
+
+filter.aod_sites.ny <- function() {
+  
+}
+
 #--------------------------------------------------------------#
 # @desc: 
 # @param:
@@ -135,7 +155,8 @@ ames.aod$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
 plot.hourly_mean.aod <- function(df, years = years.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
-             Season.Local %in% seasons)
+             Season.Local %in% seasons &
+             AOD_500nm > 0.0)
   
   ag <- aggregate(AOD_500nm ~ Time.Local+Season.Local+Year.Local,
                   df, geometric.mean)
@@ -185,7 +206,7 @@ plot.r2.daily_avg_peak.aod <- function(df, years = years.all, seasons = seasons.
     labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
     ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
-    geom_text(data = cors, aes(label = paste("R^2 = ", cor)),
+    geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     theme_bw()
 }
