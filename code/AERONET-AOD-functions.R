@@ -121,8 +121,14 @@ load_all.aod_data <- function (){
 
 # Test Code below
 ames.aod <- subset(all.aod, AERONET_Site == "NASA_Ames")
+
+# automatic tz
+tz_out <- tz_lookup_coords(lat = ames.aod$Site_Latitude.Degrees.,
+                 lon = ames.aod$Site_Longitude.Degrees.,
+                 method = "accurate")
+
+# Sets time zone for ARC
 ames.aod$DateTime.Local <- with_tz(ames.aod$DateTime.GMT, tzone = "US/Pacific")
-# head(select(ames.aod, c("DateTime.GMT", "DateTime.Local")), n = 20)
 
 ames.aod$Time.Local <- hms::as.hms(ames.aod$DateTime.Local)
 ames.aod$Date.Local <- lubridate::date(ames.aod$DateTime.Local)

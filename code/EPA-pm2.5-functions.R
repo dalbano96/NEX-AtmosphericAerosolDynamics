@@ -259,7 +259,7 @@ plot.hourly_mean.pm <- function(df, years = years.all, seasons = seasons.all) {
              Season.Local %in% seasons)
   
   ag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
-                  df, geometric.mean)
+                  df, mean)
   ag %>%
     ggplot(aes(x = Time.Local, y = Sample.Measurement)) +
     geom_point() +
@@ -281,13 +281,13 @@ plot.hourly_mean.pm <- function(df, years = years.all, seasons = seasons.all) {
 # @desc:
 # @param:
 #--------------------------------------------------------------#
-plot.daily_mean_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
+plot.box.mean_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
            Season.Local %in% seasons)
   
   ag <- aggregate(Sample.Measurement ~ Date.Local+Season.Local,
-                  df, geometric.mean)
+                  df, mean)
   
   df %>%
     ggplot(aes(x = Date.Local, y = Sample.Measurement)) +
@@ -339,13 +339,15 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
 }
 
 #--------------------------------------------------------------#
+# (WIP)
 # @desc: 
 # @param: 
 #--------------------------------------------------------------#
 plot.by_environment.pm <- function(df = all.pm) {
   df <- df %>%
     subset(!is.na(Location.Setting) &
-             Location.Setting != "")
+             Location.Setting != "" &
+             Year.Local == "2015")
   
   ag <- aggregate(Sample.Measurement ~ Month.Local+Location.Setting,
                   df, geometric.mean)
