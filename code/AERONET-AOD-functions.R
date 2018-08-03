@@ -84,6 +84,11 @@ load_all.aod_data <- function (){
   glimpse(mdb_aeronet)
   # next steps would be to filter down to the subset of data we want and work with it
   
+  # (WIP) - Removing -999 values, simpler method
+  # aod.m <- as.matrix(mdb_aeronet)
+  # aod.m[aod.m < 0] <- 0
+  # aod.df <- as.data.frame(aod.m)
+  
   aod.df <- as.data.frame(mdb_aeronet)
   
   # Replace (:) with (/) for Date column
@@ -128,12 +133,15 @@ temp.season.local <- as.yearqtr(as.yearmon(ames.aod$DateTime.Local, "%F") + 1/12
 ames.aod$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
                                 labels = c("Winter", "Spring", "Summer", "Fall"))
 
-filter.aod_data <- function() {
-  
+filter.aod_data <- function(site_names) {
+  return(subset(all.aod, AERONET_Site %in% site_names))
 }
 
 filter.aod_sites.reno <- function() {
-  
+  reno.site_names <- c("Univ_of_Nevada-Reno")
+  # After filtering data by sitename, remove -999 values
+  aod.df <- filter.aod_data(reno.site_names)
+  return(aod.df)
 }
 
 filter.aod_sites.denv <- function() {
@@ -180,7 +188,7 @@ plot.hourly_mean.aod <- function(df, years = years.all, seasons = seasons.all) {
 # @desc: Plots correlation b/w daily average and daily peak
 # @param: 
 #--------------------------------------------------------------#
-plot.r2.daily_avg_peak.aod <- function(df, years = years.all, seasons = seasons.all) {
+plot.corr.daily_avg_peak.aod <- function(df, years = years.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons &

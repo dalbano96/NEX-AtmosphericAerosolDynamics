@@ -8,12 +8,12 @@
 #--------------------------------------------------------------#
 
 # Load all data from csv files
-system.time(hourly.pm25.FRM.14_17 <- load_all_csv.pm_data())
+system.time(all.pm <- load_all_csv.pm_data())
 
 # Set default values for years, months, and seasons based on available PM data
-years.all <- unique(hourly.pm25.FRM.14_17$Year.Local)
-months.all <- unique(hourly.pm25.FRM.14_17$Month.Local)
-seasons.all <- unique(hourly.pm25.FRM.14_17$Season.Local)
+years.all <- unique(all.pm$Year.Local)
+months.all <- unique(all.pm$Month.Local)
+seasons.all <- unique(all.pm$Season.Local)
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV

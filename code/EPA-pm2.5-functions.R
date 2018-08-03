@@ -58,7 +58,14 @@ load_all_csv.pm_data <- function() {
   
   # Finished. Set wd to project root
   setwd("../..")
-  return(pm.df)
+  
+  # Load AQS site information
+  site_info <- read.csv("data/aqs_sites.csv", stringsAsFactors = FALSE)
+  site_info <- dplyr::rename(site_info, Site.Num = Site.Number)
+  site_info <- transform(site_info, State.Code = as.integer(State.Code))
+  final_df <- left_join(pm.df, site_info, by.x = c("County.Name", "Site.Num"), copy = FALSE)
+  
+  return(final_df)
 }
 
 #--------------------------------------------------------------#
@@ -67,11 +74,10 @@ load_all_csv.pm_data <- function() {
 #   state name, start date (if specified by user), end date
 #   (if specified by user), timezone.
 #--------------------------------------------------------------#
-filter.pm_data <- function(site_nums, county_names, state_name, poc) {
-  return(subset(hourly.pm25.FRM.14_17, subset = Site.Num %in% site_nums & 
+filter.pm_data <- function(site_nums, county_names, state_name) {
+  return(subset(all.pm, subset = Site.Num %in% site_nums & 
                        County.Name %in% county_names &
-                       State.Name == state_name &
-                       POC %in% poc))
+                       State.Name == state_name))
 }
 
 #--------------------------------------------------------------#
@@ -89,14 +95,13 @@ filter.pm_sites.reno <- function() {
   # Specify observed State name
   reno.state_name <- "Nevada"
   
-  # Specify observed POC
-  reno.poc <- c(1,3)
-  
   # Filter data
-  return(filter.pm_data(reno.site_nums, 
+  df <- filter.pm_data(reno.site_nums, 
                         reno.county_names, 
-                        reno.state_name,
-                        reno.poc))
+                        reno.state_name)
+  
+  # Filter by lowest POC
+  return(subset(df, POC == min(df$POC)))
 }
 
 #--------------------------------------------------------------#
@@ -113,14 +118,13 @@ filter.pm_sites.balt <- function() {
   # Specify observed State name
   balt.state_name <- "Maryland"
   
-  # Specify observed POC
-  balt.poc <- 3
-  
   # Filter data
-  return(filter.pm_data(balt.site_nums, 
+  df <- filter.pm_data(balt.site_nums, 
                         balt.county_names, 
-                        balt.state_name,
-                        balt.poc))
+                        balt.state_name)
+  
+  # Filter by lowest POC
+  return(subset(df, POC == min(df$POC)))
 }
 
 #--------------------------------------------------------------#
@@ -138,14 +142,13 @@ filter.pm_sites.denv <- function() {
   # Specify observed State name
   denv.state_name <- "Colorado"
   
-  # Specify observed POC
-  denv.poc <- 3
-  
   # Filter data
-  return(filter.pm_data(denv.site_nums, 
+  df <- filter.pm_data(denv.site_nums, 
                         denv.county_names, 
-                        denv.state_name,
-                        denv.poc))
+                        denv.state_name)
+  
+  # Filter by lowest POC
+  return(subset(df, POC == min(df$POC)))
 }
 
 #--------------------------------------------------------------#
@@ -163,14 +166,13 @@ filter.pm_sites.ny <- function() {
   # Specify observed State name
   ny.state_name <- "New York"
   
-  # Specify observed POC
-  ny.poc <- 4
-  
   # Filter data
-  return(filter.pm_data(ny.site_nums, 
+  df <- filter.pm_data(ny.site_nums, 
                         ny.county_names, 
-                        ny.state_name,
-                        ny.poc))
+                        ny.state_name)
+  
+  # Filter by lowest POC
+  return(subset(df, POC == min(df$POC)))
 }
 
 #--------------------------------------------------------------#
@@ -187,14 +189,13 @@ filter.pm_sites.LosAng <- function() {
   # Specify observed State name
   LosAng.state_name <- "California"
   
-  # Specify observed POC
-  LosAng.poc <- 3
-  
   # Filter data
-  return(filter.pm_data(LosAng.site_nums, 
+  df <- filter.pm_data(LosAng.site_nums, 
                         LosAng.county_names, 
-                        LosAng.state_name,
-                        LosAng.poc))
+                        LosAng.state_name)
+  
+  # Filter by lowest POC
+  return(subset(df, POC == min(df$POC)))
 }
 
 #--------------------------------------------------------------#
@@ -203,9 +204,9 @@ filter.pm_sites.LosAng <- function() {
 #--------------------------------------------------------------#
 filter.pm_sites.hawaii <- function() {
   # Specify observed site numbers
-  # hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
+  hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
   # hawaii.site_nums <- c(1006,1012,7)
-  hawaii.site_nums <- 1006
+  # hawaii.site_nums <- 1006
   
   # Specify observed county names
   hawaii.county_names <- c("Hawaii")
@@ -213,14 +214,13 @@ filter.pm_sites.hawaii <- function() {
   # Specify observed State name
   hawaii.state_name <- "Hawaii"
   
-  # Specify observed POC
-  hawaii.poc <- NULL
-  
   # Filter data
-  return(filter.pm_data(hawaii.site_nums, 
-                        hawaii.county_names, 
-                        hawaii.state_name,
-                        hawaii.poc))
+  df <- filter.pm_data(hawaii.site_nums, 
+                       hawaii.county_names, 
+                       hawaii.state_name)
+  
+  # Filter by lowest POC
+  return(subset(df, POC == min(df$POC)))
 }
 
 #--------------------------------------------------------------#
@@ -277,7 +277,7 @@ plot.hourly_mean.pm <- function(df, years = years.all, seasons = seasons.all) {
 }
 
 #--------------------------------------------------------------#
-# (In Progress) - Box/Whisker plot
+# (WIP) - Box/Whisker plot
 # @desc:
 # @param:
 #--------------------------------------------------------------#
@@ -304,30 +304,37 @@ plot.daily_mean_peak.pm <- function(df, years = years.all, seasons = seasons.all
 # @desc: Plots correlation b/w daily average and daily peak
 # @param: 
 #--------------------------------------------------------------#
-plot.r2.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
+plot.corr.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons)
   
+  # Aggregate Seasonal/Yearly data, as well as calculate mean and find peak value
   ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, df, 
                                       FUN = function(df) c(Mean = mean(df), 
                                                            Peak = max(df))))
   
-  cors <- ddply(ag, c("Season.Local"), 
+  # Calculate correlation coefficient by Season
+  cors <- ddply(ag, c("Season.Local", "Year.Local"), 
                 summarise, cor = round(cor(Sample.Measurement.Mean, 
                                 Sample.Measurement.Peak), 2))
   
+  # Count number of data entries by Season
+  nums <- ddply(ag, c("Season.Local", "Year.Local"),
+                summarise, num = n())
+
   ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
     geom_point() +
     geom_smooth(method = "lm", se = FALSE) +
-    # facet_grid(Season.Local ~ Year.Local) +
-    facet_wrap(~ Season.Local) +
-    # labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
+    facet_grid(Season.Local ~ Year.Local) +
+    labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
     ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
+    geom_text(data = nums, aes(label = paste("n = ", num)),
+              x = -Inf, y = Inf, hjust = -0.2, vjust = 4.2) +
     theme_bw()
 }
 
@@ -336,7 +343,7 @@ plot.r2.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.a
 # @desc: 
 # @param: 
 #--------------------------------------------------------------#
-plot.r2.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.all) {
+plot.corr.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.all) {
   pm.df <- pm.df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons)
@@ -370,3 +377,4 @@ plot.r2.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.a
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     theme_bw()
 }
+
