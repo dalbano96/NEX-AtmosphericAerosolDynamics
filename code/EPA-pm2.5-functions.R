@@ -304,7 +304,7 @@ plot.daily_mean_peak.pm <- function(df, years = years.all, seasons = seasons.all
 # @desc: Plots correlation b/w daily average and daily peak
 # @param: 
 #--------------------------------------------------------------#
-plot.corr.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
+plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons)
@@ -328,13 +328,39 @@ plot.corr.daily_avg_peak.pm <- function(df, years = years.all, seasons = seasons
     geom_point() +
     geom_smooth(method = "lm", se = FALSE) +
     facet_grid(Season.Local ~ Year.Local) +
-    labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
-    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
+    labs(x = "Daily Average (Micrograms/cubic meter)", y = "Daily Peak (Micrograms/cubic meter)") +
+    ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     geom_text(data = nums, aes(label = paste("n = ", num)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 4.2) +
+    theme_bw()
+}
+
+#--------------------------------------------------------------#
+# @desc: 
+# @param: 
+#--------------------------------------------------------------#
+plot.by_environment.pm <- function(df = all.pm) {
+  df <- df %>%
+    subset(!is.na(Location.Setting) &
+             Location.Setting != "")
+  
+  ag <- aggregate(Sample.Measurement ~ Month.Local+Location.Setting,
+                  df, geometric.mean)
+  
+  ag %>%
+    ggplot(aes(x = Month.Local, y = Sample.Measurement)) +
+    geom_point() +
+    facet_grid(Location.Setting ~ .) +
+    stat_smooth(method = "gam",
+                aes(x = Month.Local, y = Sample.Measurement),
+                formula = y ~ s(x, bs = "cc", k = 12)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    labs(x = "Month", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
+    ggtitle(paste0("PM2.5 FRM - Aggregated Monthly Data by Location Environment - ", df$County.Name, ", ", df$State.Name),
+            subtitle = paste0(unique(years), collapse = ", ")) +
     theme_bw()
 }
 
