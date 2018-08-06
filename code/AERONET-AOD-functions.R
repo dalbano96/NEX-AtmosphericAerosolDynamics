@@ -118,31 +118,30 @@ load_all.aod_data <- function (){
   return(aod.df)
 }
 
-
-# Test Code below
-ames.aod <- subset(all.aod, AERONET_Site == "NASA_Ames")
-
-# automatic tz
-tz_out <- tz_lookup_coords(lat = ames.aod$Site_Latitude.Degrees.,
-                 lon = ames.aod$Site_Longitude.Degrees.,
-                 method = "accurate")
-
-# Sets time zone for ARC
-ames.aod$DateTime.Local <- with_tz(ames.aod$DateTime.GMT, tzone = "US/Pacific")
-
-ames.aod$Time.Local <- hms::as.hms(ames.aod$DateTime.Local)
-ames.aod$Date.Local <- lubridate::date(ames.aod$DateTime.Local)
-ames.aod$Year.Local <- lubridate::year(ames.aod$DateTime.Local)
-ames.aod$Month.Local <- lubridate::month(ames.aod$DateTime.Local, label = TRUE, abbr = FALSE)
-
-temp.season.local <- as.yearqtr(as.yearmon(ames.aod$DateTime.Local, "%F") + 1/12)
-ames.aod$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
-                                labels = c("Winter", "Spring", "Summer", "Fall"))
-
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
 filter.aod_data <- function(site_names) {
-  return(subset(all.aod, AERONET_Site %in% site_names))
+  df <- subset(all.aod, AERONET_Site %in% site_names)
+  df$DateTime.Local <- tz_lookup_coords(lat = df$Site_Latitude.Degrees.,
+                                        lon = df$Site_Longitude.Degrees.,
+                                        method = "accurate")
+  df$Time.Local <- hms::as.hms(df$DateTime.Local)
+  df$Date.Local <- lubridate::date(df$DateTime.Local)
+  df$Year.Local <- lubridate::year(df$DateTime.Local)
+  df$Month.Local <- lubridate::month(df$DateTime.Local, label = TRUE, abbr = FALSE)
+  
+  temp_seasonlist <- as.yearqtr(as.yearmon(df$DateTime.Local, "%F") + 1/12)
+  df$Season.Local <- factor(format(temp_seasonlist, "%q"), levels = 1:4,
+                            labels = c("Winter", "Spring", "Summer", "Fall"))
+  return(df)
 }
 
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
 filter.aod_sites.reno <- function() {
   reno.site_names <- c("Univ_of_Nevada-Reno")
   # After filtering data by sitename, remove -999 values
@@ -150,14 +149,26 @@ filter.aod_sites.reno <- function() {
   return(aod.df)
 }
 
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
 filter.aod_sites.denv <- function() {
   
 }
 
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
 filter.aod_sites.balt <- function() {
   
 }
 
+#--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
 filter.aod_sites.ny <- function() {
   
 }
