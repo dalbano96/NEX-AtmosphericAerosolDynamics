@@ -123,10 +123,12 @@ load_all.aod_data <- function (){
 # @param:
 #--------------------------------------------------------------#
 filter.aod_data <- function(site_names) {
+  site_names <- c("Univ_of_Nevada-Reno")
   df <- subset(all.aod, AERONET_Site %in% site_names)
-  df$DateTime.Local <- tz_lookup_coords(lat = df$Site_Latitude.Degrees.,
-                                        lon = df$Site_Longitude.Degrees.,
+  local_tz <- tz_lookup_coords(lat = unique(df$Site_Latitude.Degrees.),
+                                        lon = unique(df$Site_Longitude.Degrees.),
                                         method = "accurate")
+  df$DateTime.Local <- with_tz(df$DateTime.GMT, tzone = local_tz)
   df$Time.Local <- hms::as.hms(df$DateTime.Local)
   df$Date.Local <- lubridate::date(df$DateTime.Local)
   df$Year.Local <- lubridate::year(df$DateTime.Local)
