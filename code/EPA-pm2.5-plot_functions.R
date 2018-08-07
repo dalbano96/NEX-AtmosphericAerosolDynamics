@@ -95,33 +95,21 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
   ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, df, 
                                       FUN = function(df) c(Mean = mean(df), 
                                                            Peak = max(df))))
-  # Aggregate hourly data
-  ag.a <- do.call(data.frame, aggregate(Sample.Measurement ~ Time.Local+Date.Local+Season.Local+Year.Local, df,
-                                        FUN = function(df) c(Mean = mean(df),
-                                                             Peak = max(df))))
   
   # Calculate correlation coefficient by Season
   cors <- ddply(ag, c("Season.Local", "Year.Local"), 
                 summarise, cor = round(cor(Sample.Measurement.Mean, 
                                            Sample.Measurement.Peak), 2))
   
-  cors.a <- ddply(ag.a, c("Season.Local", "Year.Local"),
-                  summarise, cor = round(cor(Sample.Measurement.Mean,
-                                             Sample.Measurement.Peak), 2))
-  
   # Count number of data entries by Season
   nums <- ddply(ag, c("Season.Local", "Year.Local"),
                 summarise, num = n())
-  
-  nums.a <- ddply(ag.a, c("Season.Local", "Year.Local"),
-                  summarise, num = n())
   
   ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
     geom_point(alpha = 0.5) +
     geom_smooth(method = "lm", se = FALSE) +
     facet_grid(Season.Local ~ Year.Local) +
-    # geom_point(data = ag.a, aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak), alpha = 0.1) +
     labs(x = "Daily Average (Micrograms/cubic meter)", y = "Daily Peak (Micrograms/cubic meter)") +
     theme(aspect.ratio = 1) +
     ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name)) +
@@ -136,21 +124,24 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
 # @desc: Plots PM measurements by location environment
 # @param: 
 #--------------------------------------------------------------#
-plot.by_environment.pm <- function(df = all.pm) {
-  df <- pm_sites.hawaii
+plot.by_environment.pm <- function(df = all.pm, seasons = seasons.all, years = years.all) {
+  state.name <- "California"
   df <- df %>%
     subset(!is.na(Location.Setting) &
-             Location.Setting != "")
+             Location.Setting != "" &
+             Season.Local %in% seasons &
+             Year.Local %in% years &
+             State.Name == state.name)
   
-  ag <- aggregate(Sample.Measurement ~ Month.Local+Year.Local+Location.Setting,
+  ag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local+Location.Setting,
                   df, mean)
   
   ag %>%
-    ggplot(aes(x = Month.Local, y = Sample.Measurement)) +
+    ggplot(aes(x = Time.Local, y = Sample.Measurement, color = Location.Setting, group = Location.Setting)) +
     geom_point() +
-    facet_grid(Location.Setting ~ Year.Local) +
+    facet_grid(Season.Local ~ Year.Local) +
     stat_smooth(method = "gam",
-                aes(x = Month.Local, y = Sample.Measurement),
+                aes(x = Time.Local, y = Sample.Measurement),
                 formula = y ~ s(x, bs = "cc", k = 12)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Month", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
