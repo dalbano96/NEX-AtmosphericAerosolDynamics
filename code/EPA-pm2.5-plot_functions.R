@@ -113,8 +113,8 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
     geom_smooth(method = "lm", se = FALSE) +
     facet_grid(Season.Local ~ Year.Local) +
     labs(x = "Daily Average (Micrograms/cubic meter)", y = "Daily Peak (Micrograms/cubic meter)") +
-    ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name),
-            subtitle = paste0(unique(years), collapse = ", ")) +
+    # theme(aspect.ratio = 1) +
+    ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name)) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     geom_text(data = nums, aes(label = paste("n = ", num)),

@@ -106,7 +106,7 @@ load_all.aod_data <- function (){
                                                   aod.df$Time.GMT), format = "%Y-%m-%d %H:%M:%S"), tz = "GMT")
   
   # Round time to nearest hour
-  aod.df$DateTime.GMT <- round_date(aod.df$DateTime.GMT, unit = "hour")
+  aod.df$DateTime.GMT <- ceiling_date(aod.df$DateTime.GMT, unit = "hour")
   
   # shut it down when done
   dbDisconnect(mdb, shutdown = TRUE)
