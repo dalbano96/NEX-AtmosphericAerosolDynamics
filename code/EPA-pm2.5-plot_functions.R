@@ -31,8 +31,6 @@ plot.all.pm <- function(data, years = years.all, months = months.all) {
 }
 
 #--------------------------------------------------------------#
-# NOTE: Function is a mess :)
-# TODO: allow it to plot from multiple sites
 # @desc: Plots hourly PM averages for a given monthly period
 #   of a given year
 # @param:
@@ -97,23 +95,35 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
   ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, df, 
                                       FUN = function(df) c(Mean = mean(df), 
                                                            Peak = max(df))))
+  # Aggregate hourly data
+  ag.a <- do.call(data.frame, aggregate(Sample.Measurement ~ Time.Local+Date.Local+Season.Local+Year.Local, df,
+                                        FUN = function(df) c(Mean = mean(df),
+                                                             Peak = max(df))))
   
   # Calculate correlation coefficient by Season
   cors <- ddply(ag, c("Season.Local", "Year.Local"), 
                 summarise, cor = round(cor(Sample.Measurement.Mean, 
                                            Sample.Measurement.Peak), 2))
   
+  cors.a <- ddply(ag.a, c("Season.Local", "Year.Local"),
+                  summarise, cor = round(cor(Sample.Measurement.Mean,
+                                             Sample.Measurement.Peak), 2))
+  
   # Count number of data entries by Season
   nums <- ddply(ag, c("Season.Local", "Year.Local"),
                 summarise, num = n())
   
+  nums.a <- ddply(ag.a, c("Season.Local", "Year.Local"),
+                  summarise, num = n())
+  
   ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
-    geom_point() +
+    geom_point(alpha = 0.5) +
     geom_smooth(method = "lm", se = FALSE) +
     facet_grid(Season.Local ~ Year.Local) +
+    # geom_point(data = ag.a, aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak), alpha = 0.1) +
     labs(x = "Daily Average (Micrograms/cubic meter)", y = "Daily Peak (Micrograms/cubic meter)") +
-    # theme(aspect.ratio = 1) +
+    theme(aspect.ratio = 1) +
     ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name)) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
@@ -123,8 +133,7 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
 }
 
 #--------------------------------------------------------------#
-# (WIP)
-# @desc: 
+# @desc: Plots PM measurements by location environment
 # @param: 
 #--------------------------------------------------------------#
 plot.by_environment.pm <- function(df = all.pm) {
@@ -152,7 +161,7 @@ plot.by_environment.pm <- function(df = all.pm) {
 
 #--------------------------------------------------------------#
 # (WIP)
-# @desc: 
+# @desc: Plot correlations b/w PM and AOD
 # @param: 
 #--------------------------------------------------------------#
 plot.corr.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.all) {
