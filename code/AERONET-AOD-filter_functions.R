@@ -156,7 +156,9 @@ filter.aod_sites.reno <- function() {
 # @param:
 #--------------------------------------------------------------#
 filter.aod_sites.denv <- function() {
-
+  denv.site_names <- c("Denver_LaCasa")
+  aod.df <- filter.aod_data(denv.site_names)
+  return(aod.df)
 }
 
 #--------------------------------------------------------------#
@@ -164,7 +166,9 @@ filter.aod_sites.denv <- function() {
 # @param:
 #--------------------------------------------------------------#
 filter.aod_sites.balt <- function() {
-
+  balt.sites_names <- c("MD_Science_Center")
+  aod.df <- filter.aod_data(balt.sites_names)
+  return(aod.df)
 }
 
 #--------------------------------------------------------------#
@@ -172,5 +176,7 @@ filter.aod_sites.balt <- function() {
 # @param:
 #--------------------------------------------------------------#
 filter.aod_sites.ny <- function() {
-
+  ny.sites_names <- c("CCNY")
+  aod.df <- filter.aod_data(ny.sites_names)
+  return(aod.df)
 }

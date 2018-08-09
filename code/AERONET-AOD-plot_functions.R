@@ -64,12 +64,12 @@ plot.corr.avg_peak.aod <- function(df, years = years.all, seasons = seasons.all)
     geom_smooth(method = "lm", se = FALSE) +
     facet_grid(Season.Local ~ Year.Local) +
     # facet_wrap(~ Season.Local) +
-    labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
-    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
-            subtitle = paste0(unique(years), collapse = ", ")) +
-    geom_text(data = cors, aes(label = paste("r = ", cor)),
-              x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
-    geom_text(data = ag.counts, aes(label = paste("n = ", count)),
-              x = -Inf, y = Inf, hjust = -0.2, vjust = 4.2) +
+    # labs(x = "Daily Average (mg/m^3)", y = "Daily Peak (mg/m^3)") +
+    # ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
+    #         subtitle = paste0(unique(years), collapse = ", ")) +
+    # geom_text(data = cors, aes(label = paste("r = ", cor)),
+    #           x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
+    # geom_text(data = ag.counts, aes(label = paste("n = ", count)),
+    #           x = -Inf, y = Inf, hjust = -0.2, vjust = 4.2) +
     theme_bw()
 }
