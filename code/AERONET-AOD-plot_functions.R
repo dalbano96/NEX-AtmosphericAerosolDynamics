@@ -39,7 +39,7 @@ plot.hourly_mean.aod <- function(df, years = years.all, seasons = seasons.all) {
 # @desc: Plots correlation b/w daily average and daily peak
 # @param: 
 #--------------------------------------------------------------#
-plot.corr.daily_avg_peak.aod <- function(df, years = years.all, seasons = seasons.all) {
+plot.corr.avg_peak.aod <- function(df, years = years.all, seasons = seasons.all) {
   df <- df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons &
@@ -51,10 +51,12 @@ plot.corr.daily_avg_peak.aod <- function(df, years = years.all, seasons = season
   
   cors <- ddply(ag, c("Season.Local"), 
                 summarise, cor = round(cor(AOD_500nm.Mean, 
-                                           AOD_500nm.Peak), 2))
+                                           AOD_500nm.Peak,
+                                           method = "spearman"), 2))
   
-  # num_counts <- ddply(cors, c("Season.Local"),
-  #                 summarise, num_count = tally(cors))  
+  # Count number of data entries by Season
+  ag.counts <- ddply(ag, c("Season.Local", "Year.Local"),
+                     summarise, count = n())
   
   ag %>%
     ggplot(aes(x = AOD_500nm.Mean, y = AOD_500nm.Peak)) +
@@ -67,5 +69,7 @@ plot.corr.daily_avg_peak.aod <- function(df, years = years.all, seasons = season
             subtitle = paste0(unique(years), collapse = ", ")) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
+    geom_text(data = ag.counts, aes(label = paste("n = ", count)),
+              x = -Inf, y = Inf, hjust = -0.2, vjust = 4.2) +
     theme_bw()
 }

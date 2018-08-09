@@ -99,11 +99,12 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
   # Calculate correlation coefficient by Season
   cors <- ddply(ag, c("Season.Local", "Year.Local"), 
                 summarise, cor = round(cor(Sample.Measurement.Mean, 
-                                           Sample.Measurement.Peak), 2))
+                                           Sample.Measurement.Peak,
+                                           method = "spearman"), 2))
   
   # Count number of data entries by Season
-  nums <- ddply(ag, c("Season.Local", "Year.Local"),
-                summarise, num = n())
+  ag.counts <- ddply(ag, c("Season.Local", "Year.Local"),
+                summarise, count = n())
   
   ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
@@ -115,7 +116,7 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
     ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name)) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
-    geom_text(data = nums, aes(label = paste("n = ", num)),
+    geom_text(data = ag.counts, aes(label = paste("n = ", count)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 4.2) +
     theme_bw()
 }
@@ -124,8 +125,7 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
 # @desc: Plots PM measurements by location environment
 # @param: 
 #--------------------------------------------------------------#
-plot.by_environment.pm <- function(df = all.pm, seasons = seasons.all, years = years.all) {
-  state.name <- "California"
+plot.environment.hourly_mean.pm <- function(df = all.pm, seasons = seasons.all, years = years.all, state.name) {
   df <- df %>%
     subset(!is.na(Location.Setting) &
              Location.Setting != "" &
@@ -133,7 +133,7 @@ plot.by_environment.pm <- function(df = all.pm, seasons = seasons.all, years = y
              Year.Local %in% years &
              State.Name == state.name)
   
-  ag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local+Location.Setting,
+  ag <- aggregate(Sample.Measurement ~ Location.Setting+Time.Local+Season.Local+Year.Local,
                   df, mean)
   
   ag %>%
@@ -147,6 +147,24 @@ plot.by_environment.pm <- function(df = all.pm, seasons = seasons.all, years = y
     labs(x = "Month", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     # ggtitle(paste0("PM2.5 FRM - Aggregated Monthly Data by Location Environment - ", df$County.Name, ", ", df$State.Name),
     #         subtitle = paste0(unique(years), collapse = ", ")) +
+    theme_bw()
+}
+
+#--------------------------------------------------------------#
+# @desc:
+# @param: 
+#--------------------------------------------------------------#
+plot.environment.site_count.pm <- function(df = all.pm, seasons = seasons.all, years = years.all, state.name) {
+  df <- df %>%
+    subset(!is.na(Location.Setting) &
+             Location.Setting != "" &
+             Season.Local %in% seasons &
+             Year.Local %in% years &
+             State.Name == state.name)
+  
+  df %>%
+    ggplot(aes(x = Location.Setting, fill = factor(Location.Setting))) +
+    geom_bar() +
     theme_bw()
 }
 
@@ -174,7 +192,9 @@ plot.corr.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons
                                           FUN = function(aod.df) c(Mean = mean(aod.df), 
                                                                    Peak = max(aod.df))))
   # TODO: Merge aod and pm? - This would be problematic...
-  cors <- cor(x = pm.ag$Sample.Measurement, y = aod.ag$Sample.Measurement)
+  cors <- cor(x = pm.ag$Sample.Measurement, 
+              y = aod.ag$Sample.Measurement, 
+              method = "spearman")
   
   ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
