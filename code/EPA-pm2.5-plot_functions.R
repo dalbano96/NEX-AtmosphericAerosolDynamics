@@ -64,20 +64,34 @@ plot.hourly_mean.pm <- function(df, years = years.all, seasons = seasons.all) {
 # @param:
 #--------------------------------------------------------------#
 plot.box.mean_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
+  df <- pm_sites.reno
+  years <- "2015"
+  seasons <- seasons.all
   df <- df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons)
   
-  ag <- aggregate(Sample.Measurement ~ Date.Local+Season.Local,
-                  df, mean)
+  # Aggregate Seasonal/Yearly data, as well as calculate mean and find peak value
+  ag <- gather(do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, df,
+                                      FUN = function(df) c(Mean = mean(df),
+                                                           Peak = max(df)))),
+               key = "Type", value = "Sample.Measurement", Sample.Measurement.Mean, Sample.Measurement.Peak)
   
-  df %>%
-    ggplot(aes(x = Date.Local, y = Sample.Measurement)) +
-    geom_boxplot(aes(group = Date.Local), outlier.shape = 1) +
-    facet_wrap(~ Season.Local) +
-    geom_point(data = ag, aes(x = Date.Local, y = Sample.Measurement), shape = 17) +
-    labs(x = "Date", y = "PM2.5 Concentration (Micrograms/cubic meter)") +
-    ggtitle(paste0("PM2.5 FRM - Daily Average - ", df$County.Name, ", ", df$State.Name),
+  # ag <- do.call(data.frame, aggregate(cbind(Sample.Measurement, Time.Local) ~ Date.Local+Season.Local+Year.Local, df,
+  #                                     FUN = function(df) c(Mean = mean(df),
+  #                                                          Peak = max(df))))
+  # 
+  # ah <- select(df, c("Sample.Measurement", "Date.Local", "Time.Local", "Season.Local", "Year.Local"))
+  
+  ag %>%
+    ggplot() +
+    geom_point(aes(x = Date.Local, y = Sample.Measurement, color = Type, shape = Type), size = 2.5) +
+    scale_color_manual(values = c("Sample.Measurement.Peak" = "Red", 
+                                  "Sample.Measurement.Mean" = "Blue")) +
+    stat_summary(aes(x = Date.Local, y = Sample.Measurement), geom = "linerange", size = 0.2, alpha = 0.8) +
+    labs(x = "Date", 
+         y = "PM2.5 Concentration (Micrograms/cubic meter)") +
+    ggtitle(paste0("PM2.5 FRM - Daily Average and Peak - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
     theme_bw()
 }
@@ -213,7 +227,7 @@ plot.corr.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons
     facet_grid(Season.Local ~ Year.Local) +
     labs(x = "Daily Average", y = "Daily Peak") +
     # ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
-            subtitle = paste0(unique(years), collapse = ", ")) +
+    #         subtitle = paste0(unique(years), collapse = ", ")) +
     # geom_text(data = pm.cors, aes(label = paste("r = ", cor)),
     #           x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     theme_bw()
