@@ -12,20 +12,22 @@
 # Used to determine site locations to analyze
 #--------------------------------------------------------------#
 load.map <- function() {
+  all.pm <- all.pm %>% subset(Location.Setting == "URBAN AND CENTER CITY")
   leaflet(unique(select(all.pm, c(Longitude, Latitude, Site.Num, County.Name)))) %>%
     # AERONET Sites
-    addCircles(data = unique(select(subset(all.aod, DateTime.GMT >= "2014-01-01" & DateTime.GMT <= "2017-12-31"), c(Site_Longitude.Degrees., Site_Latitude.Degrees., AERONET_Site))),
-               lng = ~Site_Longitude.Degrees.,
-               lat = ~Site_Latitude.Degrees.,
-               color = "red",
-               radius = 5000,
-               label = ~paste("[AERONET] Site Name: ", AERONET_Site)) %>%
+    # addCircles(data = unique(select(subset(all.aod, DateTime.GMT >= "2014-01-01" & DateTime.GMT <= "2017-12-31"), c(Site_Longitude.Degrees., Site_Latitude.Degrees., AERONET_Site))),
+    #            lng = ~Site_Longitude.Degrees.,
+    #            lat = ~Site_Latitude.Degrees.,
+    #            color = "red",
+    #            radius = 5000,
+    #            label = ~paste("[AERONET] Site Name: ", AERONET_Site)) %>%
     # EPA Sites
-    addCircles(data = unique(select(all.pm, c(Longitude, Latitude, Site.Num, County.Name))), 
+    addCircles(data = unique(select(all.pm, c(Longitude, Latitude, Site.Num, County.Name, Location.Setting))), 
                lng = ~Longitude, 
                lat = ~Latitude,
                label = ~paste("[EPA] Site Num: ", Site.Num, ", ",
-                              "County Name: ", County.Name)) %>%
+                              "County Name: ", County.Name, ", ",
+                              "Env: ", Location.Setting)) %>%
     addTiles() %>%
     addProviderTiles(providers$CartoDB.Positron) %>%
     addScaleBar() %>%

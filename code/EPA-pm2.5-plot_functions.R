@@ -174,6 +174,9 @@ plot.environment.site_count.pm <- function(df = all.pm, seasons = seasons.all, y
 # @param: 
 #--------------------------------------------------------------#
 plot.corr.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons.all) {
+  pm.df <- pm_sites.reno
+  aod.df <- aod_sites.reno
+  
   pm.df <- pm.df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons)
@@ -188,24 +191,30 @@ plot.corr.aod_pm <- function(pm.df, aod.df, years = years.all, seasons = seasons
                                                                  Peak = max(pm.df))))
   
   # Calculates average and peak values for sample measurement of AOD
-  aod.ag <- do.call(data.frame, aggregate(Sample.Measurement ~ Date.Local+Season.Local+Year.Local, aod.df, 
+  aod.ag <- do.call(data.frame, aggregate(AOD_500nm ~ Date.Local+Season.Local+Year.Local, aod.df, 
                                           FUN = function(aod.df) c(Mean = mean(aod.df), 
                                                                    Peak = max(aod.df))))
-  # TODO: Merge aod and pm? - This would be problematic...
-  cors <- cor(x = pm.ag$Sample.Measurement, 
-              y = aod.ag$Sample.Measurement, 
-              method = "spearman")
   
-  ag %>%
+  pm.cors <- ddply(pm.ag, c("Season.Local", "Year.Local"), 
+                summarise, cor = round(cor(Sample.Measurement.Mean, 
+                                           Sample.Measurement.Peak,
+                                           method = "spearman"), 2))
+  
+  aod.cors <- ddply(aod.ag, c("Season.Local", "Year.Local"),
+                    summarise, cor = round(cor(aod.ag$AOD_500nm.Mean,
+                                               aod.ag$AOD_500nm.Peak,
+                                               method = "spearman"), 2))
+  
+  pm.ag %>%
     ggplot(aes(x = Sample.Measurement.Mean, y = Sample.Measurement.Peak)) +
     geom_point() +
+    geom_point(aod.ag, aes(x = AOD_500nm.Mean, y = AOD_500nm.Peak)) +
     geom_smooth(method = "lm", se = FALSE) +
-    # facet_grid(Season.Local ~ Year.Local) +
-    facet_wrap(~ Season.Local) +
+    facet_grid(Season.Local ~ Year.Local) +
     labs(x = "Daily Average", y = "Daily Peak") +
-    ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
+    # ggtitle(paste0("PM2.5 FRM - Correlation Coefficient (Daily Average vs. Daily Peak) - ", df$County.Name, ", ", df$State.Name),
             subtitle = paste0(unique(years), collapse = ", ")) +
-    geom_text(data = cors, aes(label = paste("r = ", cor)),
-              x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
+    # geom_text(data = pm.cors, aes(label = paste("r = ", cor)),
+    #           x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +
     theme_bw()
 }

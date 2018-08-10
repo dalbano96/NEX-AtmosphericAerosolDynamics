@@ -8,6 +8,7 @@
 #--------------------------------------------------------------#
 
 #--------------------------------------------------------------#
+# Note: Not suitable due to lack of consistency
 # @desc: 
 # @param:
 #--------------------------------------------------------------#
@@ -27,11 +28,10 @@ plot.hourly_mean.aod <- function(df, years = years.all, seasons = seasons.all) {
                 aes(x = Time.Local, y = AOD_500nm),
                 formula = y ~ s(x, bs = "cc", k = 24)) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    # labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
+    labs(x = "Hour", y = "AOD 500nm") +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
                        label = c("Midnight", "06:00", "Noon", "18:00", "23:00")) +
-    ggtitle(paste0("PM2.5 FRM - Aggregated Hourly data - ", df$County.Name, ", ", df$State.Name),
-            subtitle = paste0(unique(years), collapse = ", ")) +
+    ggtitle(paste0("AOD AERONET - Aggregated Hourly data - ", df$AERONET_Site)) +
     theme_bw()
 }
 

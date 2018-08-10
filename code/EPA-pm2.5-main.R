@@ -50,6 +50,11 @@ pm_sites.LosAng <- filter.pm_sites.LosAng()
 pm_sites.hawaii <- filter.pm_sites.hawaii()
 
 #--------------------------------------------------------------#
+# PM2.5 Data for SF-Oak Region
+#--------------------------------------------------------------#
+pm_sites.RA <- filter.pm_sites.RA()
+
+#--------------------------------------------------------------#
 # Hourly PM2.5 Data of all sites
 #--------------------------------------------------------------#
 # complete_pmsites <- NULL

@@ -9,7 +9,7 @@
 
 #--------------------------------------------------------------#
 # (WIP)
-# @desc:
+# @desc: DB based
 # @param:
 #--------------------------------------------------------------#
 load_all.pm_data <- function() {
@@ -238,4 +238,18 @@ filter.pm_sites.hawaii <- function() {
 
   # Filter by lowest POC
   return(subset(df, POC == min(df$POC)))
+}
+
+#--------------------------------------------------------------#
+# @desc: SF-Oak Region
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.RA <- function() {
+  RA.sites_nums <- c(5,12,13)
+  RA.county_names <- c("San Francisco","Alameda")
+  RA.state_name <- c("California")
+  df <- filter.pm_data(RA.sites_nums,
+                       RA.county_names,
+                       RA.state_name)
+  return(df)
 }
