@@ -15,6 +15,9 @@ years.all <- unique(all.pm$Year.Local)
 months.all <- unique(all.pm$Month.Local)
 seasons.all <- unique(all.pm$Season.Local)
 
+# Load temperature data
+system.time(all.temperature <- load_all_csv.temperature())
+
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of Reno, NV
 #--------------------------------------------------------------#
@@ -53,6 +56,11 @@ pm_sites.hawaii <- filter.pm_sites.hawaii()
 # PM2.5 Data for SF-Oak Region
 #--------------------------------------------------------------#
 pm_sites.RA <- filter.pm_sites.RA()
+
+#--------------------------------------------------------------#
+# PM2.5 Data for Philadelphia Region
+#--------------------------------------------------------------#
+pm_sites.RB <- filter.pm_sites.RB()
 
 #--------------------------------------------------------------#
 # Hourly PM2.5 Data of all sites

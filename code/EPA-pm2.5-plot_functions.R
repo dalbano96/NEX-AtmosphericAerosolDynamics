@@ -64,9 +64,6 @@ plot.hourly_mean.pm <- function(df, years = years.all, seasons = seasons.all) {
 # @param:
 #--------------------------------------------------------------#
 plot.box.mean_peak.pm <- function(df, years = years.all, seasons = seasons.all) {
-  df <- pm_sites.reno
-  years <- "2015"
-  seasons <- seasons.all
   df <- df %>%
     subset(subset = Year.Local %in% years &
              Season.Local %in% seasons)
@@ -77,9 +74,13 @@ plot.box.mean_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
                                                            Peak = max(df)))),
                key = "Type", value = "Sample.Measurement", Sample.Measurement.Mean, Sample.Measurement.Peak)
   
-  # ag <- do.call(data.frame, aggregate(cbind(Sample.Measurement, Time.Local) ~ Date.Local+Season.Local+Year.Local, df,
+  # # Finds the peak value for each hour of each day?
+  # # It is possible to group by day and find the max value from there
+  # ag <- gather(do.call(data.frame, aggregate(cbind(Sample.Measurement, Time.Local) ~ Date.Local+Season.Local+Year.Local, df,
   #                                     FUN = function(df) c(Mean = mean(df),
-  #                                                          Peak = max(df))))
+  #                                                          Peak = max(df),
+  #                                                          Time = select(df, c("Time.Local"))))),
+  #              key = "Type", value = "Sample.Measurement", Sample.Measurement.Mean, Sample.Measurement.Peak)
   # 
   # ah <- select(df, c("Sample.Measurement", "Date.Local", "Time.Local", "Season.Local", "Year.Local"))
   
@@ -126,7 +127,8 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
     geom_smooth(method = "lm", se = FALSE) +
     facet_grid(Season.Local ~ Year.Local) +
     labs(x = "Daily Average (Micrograms/cubic meter)", y = "Daily Peak (Micrograms/cubic meter)") +
-    theme(aspect.ratio = 1) +
+    coord_fixed(ratio = 1, xlim = c(0,75), ylim = c(0,75)) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
     ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name)) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
               x = -Inf, y = Inf, hjust = -0.2, vjust = 2.2) +

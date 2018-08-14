@@ -86,6 +86,23 @@ load_all_csv.pm_data <- function() {
 }
 
 #--------------------------------------------------------------#
+# @desc:
+# @param:
+#--------------------------------------------------------------#
+load_all_csv.temperature <- function() {
+  setwd("data/62101 2014-2017/")
+  
+  # Get csv filenames
+  file_names <-list.files(pattern = "*.csv")
+  
+  # Load files to data frame
+  temperature.df <- do.call(rbind, lapply(file_names, function(x) read.csv(x, stringsAsFactors = FALSE)))
+  
+  setwd("../..")
+  return(temperature.df)
+}
+
+#--------------------------------------------------------------#
 # @desc: Filters PM data frame based on specified location.
 # @param: PM SITE INFO ->Site number(s), county names(s),
 #   state name, start date (if specified by user), end date
@@ -251,5 +268,19 @@ filter.pm_sites.RA <- function() {
   df <- filter.pm_data(RA.sites_nums,
                        RA.county_names,
                        RA.state_name)
+  return(df)
+}
+
+#--------------------------------------------------------------#
+# @desc: Philadelphia Region
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.RB <- function() {
+  RB.sites_nums <- c(76,55,47,57,48)
+  RB.county_names <- c("Philadelphia")
+  RB.state_name <- c("Pennsylvania")
+  df <- filter.pm_data(RB.sites_nums,
+                       RB.county_names,
+                       RB.state_name)
   return(df)
 }
