@@ -98,6 +98,38 @@ load_all_csv.temperature <- function() {
   # Load files to data frame
   temperature.df <- do.call(rbind, lapply(file_names, function(x) read.csv(x, stringsAsFactors = FALSE)))
   
+  # Convert Date columns from character to date objects
+  temperature.df$Date.Local <- as.Date(temperature.df$Date.Local, format = "%F")
+  temperature.df$Date.GMT <- as.Date(temperature.df$Date.GMT, format = "%F")
+  
+  # Joining date and time into single column for local and GMT
+  temperature.df$DateTime.Local <- as.POSIXct(paste(temperature.df$Date.Local,
+                                           temperature.df$Time.Local),
+                                     format = "%F %R")
+  temperature.df$DateTime.GMT <- force_tz(as.POSIXct(paste(temperature.df$Date.GMT,
+                                                  temperature.df$Time.GMT),
+                                            format = "%F %R"), tz = "GMT")
+  
+  # Convert Time columns to integer values b/w [0-23]
+  temperature.df$Time.Local <- hour(hms::parse_hm(temperature.df$Time.Local))
+  temperature.df$Time.GMT <- hour(hms::parse_hm(temperature.df$Time.GMT))
+  
+  # Parse into month and year columns for Date.Local and Date.GMT
+  temperature.df <- temperature.df %>%
+    mutate(Month.Local = month(Date.Local, label = TRUE, abbr = FALSE),
+           Year.Local = year(Date.Local),
+           Month.GMT = month(Date.GMT, label = TRUE, abbr = FALSE),
+           Year.GMT = month(Date.GMT))
+  
+  # Cateogrizes time by season
+  temp.season.local <- as.yearqtr(as.yearmon(temperature.df$DateTime.Local, "%F") + 1/12)
+  temperature.df$Season.Local <- factor(format(temp.season.local, "%q"), levels = 1:4,
+                               labels = c("Winter", "Spring", "Summer", "Fall"))
+  
+  temp.season.gmt <- as.yearqtr(as.yearmon(temperature.df$DateTime.GMT, "%F") + 1/12)
+  temperature.df$Season.GMT <- factor(format(temp.season.gmt, "%q"), levels = 1:4,
+                             labels = c("Winter", "Spring", "Summer", "Fall"))
+  
   setwd("../..")
   return(temperature.df)
 }
@@ -120,8 +152,7 @@ filter.pm_data <- function(site_nums, county_names, state_name) {
 #--------------------------------------------------------------#
 filter.pm_sites.reno <- function() {
   # Specify observed site numbers
-  reno.site_nums <- c(1005)
-  # reno.site_nums <- c(1005)
+  reno.site_nums <- c(16)
 
   # Specify observed county names
   reno.county_names <- c("Washoe")
@@ -284,3 +315,13 @@ filter.pm_sites.RB <- function() {
                        RB.state_name)
   return(df)
 }
+
+ag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
+                df, mean)
+
+tempag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
+                    all.temperature, mean)
+
+pmag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
+                  all.pm, mean)
+
