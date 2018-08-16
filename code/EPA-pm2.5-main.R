@@ -63,6 +63,11 @@ pm_sites.RA <- filter.pm_sites.RA()
 pm_sites.RB <- filter.pm_sites.RB()
 
 #--------------------------------------------------------------#
+# PM2.5 Data for Minneapolis, MN Region
+#--------------------------------------------------------------#
+pm_sites.RC <- filter.pm_sites.RC()
+
+#--------------------------------------------------------------#
 # Hourly PM2.5 Data of all sites
 #--------------------------------------------------------------#
 # complete_pmsites <- NULL

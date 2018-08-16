@@ -8,26 +8,28 @@
 #--------------------------------------------------------------#
 
 #--------------------------------------------------------------#
-# TODO: allow it to plot from multiple sites
-# @desc: Plots PM data for a given time range
-#   for pm2.5
+# @desc: Plots ALL PM data for a given time range
+#   for pm2.5. Useful in checking for data availability.
 # @param:
 #--------------------------------------------------------------#
-plot.all.pm <- function(data, years = years.all, months = months.all) {
-  data %>%
+plot.all.pm <- function(df, years = years.all, months = months.all) {
+  ag <- aggregate(Sample.Measurement ~ Site.Num+Date.Local+Month.Local+Season.Local+Year.Local,
+                  df, mean)
+  ag %>%
     subset(Year.Local %in% years
            & Month.Local %in% months) %>%
-    ggplot(aes(x = strptime(DateTime.Local, format = "%F %H:%M"), 
+    ggplot(aes(x = strptime(Date.Local, format = "%F"), 
                y = Sample.Measurement, 
                group = Site.Num, color = as.character(Site.Num))) +
     geom_point() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Time", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = "Sites") +
     scale_x_datetime(date_breaks = "3 months") +
-    ggtitle(paste0(data$State.Name, " [", 
-                   head(data$DateTime.Local, n = 1), " to ", 
-                   tail(data$DateTime.Local, n = 1), "] ", "POC: ", 
-                   data$POC))
+    ggtitle(paste0(df$State.Name, " [", 
+                   head(df$DateTime.Local, n = 1), " to ", 
+                   tail(df$DateTime.Local, n = 1), "] ", "POC: ", 
+                   df$POC)) +
+    theme_bw()
 }
 
 #--------------------------------------------------------------#
@@ -179,9 +181,9 @@ plot.corr.avg_peak.pm <- function(df, years = years.all, seasons = seasons.all) 
     geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
     ggtitle(paste0("PM2.5 FRM - Correlation b/w Daily Average and Daily Peak - ", df$County.Name, ", ", df$State.Name)) +
     geom_text(data = cors, aes(label = paste("r = ", cor)),
-              x = 30, y = 40, hjust = -0.2, vjust = 2.2) +
+              x = 40, y = 20, hjust = -0.2, vjust = 2.2) +
     geom_text(data = ag.counts, aes(label = paste("n = ", count)),
-              x = 30, y = 40, hjust = -0.2, vjust = 4.2) +
+              x = 40, y = 20, hjust = -0.2, vjust = 4.2) +
     theme_bw()
 }
 
@@ -220,8 +222,7 @@ plot.environment.hourly_mean.pm <- function(df = all.pm, seasons = seasons.all, 
 #--------------------------------------------------------------#
 plot.environment.site_count.pm <- function(df = all.pm, seasons = seasons.all, years = years.all) {
   df <- df %>%
-    subset(!is.na(Location.Setting) &
-             Location.Setting != "" &
+    subset(Location.Setting != "" &
              Season.Local %in% seasons &
              Year.Local %in% years)
   df %>%

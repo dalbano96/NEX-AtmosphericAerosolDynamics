@@ -269,9 +269,10 @@ filter.pm_sites.LosAng <- function() {
 #--------------------------------------------------------------#
 filter.pm_sites.hawaii <- function() {
   # Specify observed site numbers
-  hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
+  # hawaii.site_nums <- c(2021, 1006, 2023, 7, 2016, 2020, 1012)
   # hawaii.site_nums <- c(1006,1012,7)
   # hawaii.site_nums <- 1006
+  hawaii.site_nums <- 7
 
   # Specify observed county names
   hawaii.county_names <- c("Hawaii")
@@ -316,12 +317,29 @@ filter.pm_sites.RB <- function() {
   return(df)
 }
 
-ag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
-                df, mean)
+#--------------------------------------------------------------#
+# @desc: Minneapolis, MN Region
+# @param:
+#--------------------------------------------------------------#
+filter.pm_sites.RC <- function() {
+  RC.sites_nums <- c(1905,909,1909)
+  RC.county_names <- c("Hennepin")
+  RC.state_name <- c("Minnesota")
+  df <- filter.pm_data(RC.sites_nums,
+                       RC.county_names,
+                       RC.state_name)
+  return(df)
+}
 
-tempag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
-                    all.temperature, mean)
 
-pmag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
-                  all.pm, mean)
-
+# Testing
+# 
+# ag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
+#                 df, mean)
+# 
+# tempag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
+#                     all.temperature, mean)
+# 
+# pmag <- aggregate(Sample.Measurement ~ Time.Local+Season.Local+Year.Local,
+#                   all.pm, mean)
+# 
