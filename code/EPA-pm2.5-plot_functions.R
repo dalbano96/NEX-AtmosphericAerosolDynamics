@@ -99,6 +99,7 @@ plot.hourly_mean.pm <- function(df, years = years.all, seasons = seasons.all) {
                 aes(x = Time.Local, y = Sample.Measurement),
                 formula = y ~ s(x, bs = "cc", k = 24)) +
     facet_grid(Year.Local ~ Season.Local) +
+    ylim(0,20) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     labs(x = "Hour", y = "PM2.5 Concentration (Micrograms/cubic meter)", color = ("Site")) +
     scale_x_continuous(breaks = c(0, 6, 12, 18, 23),
@@ -140,6 +141,7 @@ plot.range.mean_peak.pm <- function(df, years = years.all, seasons = seasons.all
     scale_color_manual(values = c("Sample.Measurement.Peak" = "Red", 
                                   "Sample.Measurement.Mean" = "Blue")) +
     stat_summary(aes(x = Date.Local, y = Sample.Measurement), geom = "linerange", size = 0.2, alpha = 0.8) +
+    ylim(0,85) +
     labs(x = "Date", 
          y = "PM2.5 Concentration (Micrograms/cubic meter)") +
     ggtitle(paste0("PM2.5 FRM - Daily Average and Peak - ", df$County.Name, ", ", df$State.Name),
