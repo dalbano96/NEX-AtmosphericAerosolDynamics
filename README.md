@@ -1,8 +1,4 @@
-# NEX - Atmospheric Aerosol Dynamics
-NASA OSSI - Summer 2018
-### Datasets (publicly available)
-* PM2.5 FRM/FEM Mass (88101) - Hourly
-	* 2017 - https://aqs.epa.gov/aqsweb/airdata/hourly_88101_2017.zip
-	* 2016 - https://aqs.epa.gov/aqsweb/airdata/hourly_88101_2016.zip
-	* 2015 - https://aqs.epa.gov/aqsweb/airdata/hourly_88101_2015.zip
-	* 2014 - https://aqs.epa.gov/aqsweb/airdata/hourly_88101_2014.zip
+# NASA Earth Exchange - Atmospheric Aerosol Dynamics - NASA Ames Research Center
+Data Analyst Intern at NEX, Summer 2018
+
+The NASA Earth Exchange team enables several Earth science projects, including atmospheric aerosol dynamics. Particulate matter (PM) has a significant presence in air pollution, with PM being a major contribution to respiratory diseases. With the availability of atmospheric aerosol data from satellites, PM can be observed in remote locations lacking ground-based monitoring stations. However, the detection of PM from satellites requires calibration using ground-based aerosol data. The goal of this work is to use ground-based aerosol data collected by the Environmental Protection Agency (EPA) and the AErosol RObotic NETwork (AERONET) to improve atmospheric aerosol mapping from satellite observations.
